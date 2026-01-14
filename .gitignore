@@ -1,0 +1,29 @@
+# Python caches
+__pycache__/
+*.py[cod]
+
+# Virtual envs
+.venv/
+venv/
+venv_*/
+*/venv_*/
+*/.venv/
+
+# Env files (NO subir local)
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+
+# OS/editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Build / packaging
+build/
+dist/
+*.egg-info/
