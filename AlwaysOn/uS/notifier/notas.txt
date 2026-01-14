@@ -1,0 +1,21 @@
+"""
+
+Supuestos del sistema de notificaciones:
+
+Como resultado de analisis:
+    'Remind': Actualizar contador de eventos
+    'Update': No enviar notificaciones, solo aumentar el contador
+    'Create': Evento nuevo, debe registrarse desde cero
+
+Después de las acciones previas hay que actualizar la base de datos
+
+    'Update':   (No hay acción) Solo se modificó el contador de eventos
+
+    'Remind':   Después de confirmar el envío de la notificación, 
+                actualizar el ts de la última notificación enviada de ese registro
+
+    'Create':   [No hay acción] Registro creado de cero, es primera notifiación enviada
+    
+    
+    
+"""

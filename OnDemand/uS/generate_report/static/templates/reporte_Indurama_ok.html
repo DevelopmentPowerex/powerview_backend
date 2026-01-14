@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Informe Periódico | PowerView</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+    tailwind.config = {
+        theme: {
+            extend: {
+                colors: {
+                    brand: {
+                        50: '#eef7ff',
+                        100: '#d9ecff',
+                        200: '#aedaff',
+                        300: '#7cc2ff',
+                        400: '#4aa6ff',
+                        500: '#1f86ff',
+                        600: '#1068db',
+                        700: '#0b50ad',
+                        800: '#0a3e85',
+                        900: '#082f66'
+                    }
+                },
+                fontFamily: {
+                    sans: ["Inter", "ui-sans-serif", "system-ui", "Segoe UI", "Roboto", "Helvetica", "Arial", "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji"]
+                }
+            }
+        }
+    }
+    </script>
+    <style>
+        @page{
+            size: A4;
+            margin: 20mm;
+        }
+        @media print {
+            .content-wrapper {
+                padding-top: 25mm;   /* mismo espacio reservado que el header */
+                padding-bottom: 20mm; /* espacio para footer */
+            }
+            header {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 20mm;
+            }
+            footer {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                height: 15mm;
+            }
+            body {
+                margin-top: 0mm;  /* compensar espacio para el header */
+                margin-bottom: 0mm; /* compensar espacio para el footer */
+            }
+            .page-break {
+                page-break-after: always;
+            }
+            /* Evitar que las tablas se dividan entre páginas */
+            table table, thead, tbody, tr, td, th{
+                page-break-inside: avoid !important;
+            }
+    
+            /* Asegurar que los encabezados no queden solos al final de página */
+            h1, h2, h3, h4, h5, h6 {
+                page-break-after: avoid;
+            }
+            /* Numeración automática de páginas */
+            .page-number:after {
+                content: counter(page);
+            }
+            .grid-item{
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+            }
+        }
+        
+        /* Estilos para visualización en navegador */
+        @media screen {
+            body {
+                background-color: #f3f4f6;
+                padding: 20px;
+            }
+            .container {
+                max-width: 210mm;
+                margin: 0 auto;
+                background: white;
+                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+                padding: 20mm;
+            }
+        }
+        
+        /* Estilos generales */
+        body {
+            font-family: "Inter", sans-serif;
+            color: #1e293b;
+        }
+        
+    </style>
+</head>
+
+<body>
+    <!-- Encabezado de página -->
+    <header class="header flex justify-between items-center border-b border-slate-200 px-8 py-3 bg-white">
+    <div class="flex items-center">
+        <img src="/OnDemand/uS/generate_report/static/img/loguito.png" 
+            alt="PowerView" class="h-6 mr-3">
+        <span class="text-md font-semibold">Laboratorios RI</span>
+    </div>
+    <div class="text-right text-sm text-slate-500">
+        <p><b>Cliente: </b>INDURAMA ECUADOR S.A.</p>
+        <p><b>Fecha de generación: </b>09/01/2026</p>
+    </div>
+    </header>
+
+    <!-- PORTADA -->
+    <div class="min-h-screen flex flex-col items-center justify-center">
+        <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight text-slate-900 text-center mt-6">INFORME PERIÓDICO</h1>
+        <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight text-slate-900 text-center mt-6">LABORATORIOS RI</h1>
+        <p class="mt-4 text-lg text-slate-600 text-center mb-10">Detalles del sistema eléctrico monitoreado por PowerView</p>
+        
+        <div class="mt-10 grid grid-cols-3 md:grid-cols-3 gap-4 mb-12">
+            <div class="p-4 rounded-sm border border-slate-200">
+                <p class="text-xs uppercase tracking-wider text-slate-500">Cliente</p>
+                <p class="font-medium">INDURAMA ECUADOR S.A.</p>
+            </div>
+            <div class="p-4 rounded-sm border border-slate-200">
+                <p class="text-xs uppercase tracking-wider text-slate-500">Proyecto</p>
+                <p class="font-medium">Laboratorios RI</p>
+            </div>
+            <div class="p-4 rounded-sm border border-slate-200">
+                <p class="text-xs uppercase tracking-wider text-slate-500">Circuitos Monitoreados</p>
+                <p class="font-medium">Entrada Empresa Eléctrica</p>
+                <p class="font-medium">Alimentación Laboratorio 7</p>
+                <p class="font-medium">Alimentación Laboratorio 8</p>
+            </div>
+            <div class="p-4 rounded-sm border border-slate-200">
+                <p class="text-xs uppercase tracking-wider text-slate-500">Rango de fechas</p>
+                <p class="font-medium">06/12/2025 - 31/12/2025</p>
+            </div>
+            <div class="p-4 rounded-sm border border-slate-200">
+                <p class="text-xs uppercase tracking-wider text-slate-500">Medidores utilizados</p>
+                <p class="font-medium">PV-M3</p>
+            </div>
+            <div class="p-4 rounded-sm border border-slate-200">
+                <p class="text-xs uppercase tracking-wider text-slate-500">Emitido por</p>
+                <p class="font-medium">Premium Energía SAS</p>
+            </div>
+        </div>
+        
+        <div class="flex justify-center gap-12">
+            <img src="/OnDemand/uS/generate_report/static/img/logo_powerview.png" alt="POWEREX" class="w-full h-auto max-h-20 object-contain"/>
+        </div>
+    </div>
+
+    <main class="container">
+
+        <p class="mt-4 text-slate-700 leading-relaxed text-sm">
+        Los datos adjuntos en este informe fueron obtenidos a través del sistema de monitoreo y telemetría PowerView©. Este es un informe automatizado que incluye los detalles más relevantes del
+        sistema eléctrico dentro de las fechas solicitadas.
+        </p> 
+        
+        <div section>
+            <h2 class=" mt-4 text-2xl font-bold text-slate-900">1. Resumen de parámetros de cada circuito</h2>
+            
+            <p class="mt-4 text-sm text-slate-600">Valores máximo, mínimo y promedio para cada uno de los parametros eléctricos leídos dentro del rango de tiempo del informe.</p>
+            
+            <div section>
+                <h3 class="text-xl font-bold text-slate-900 mt-4">Entrada Empresa Eléctrica</h3>
+
+                <div class="mt-4 grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 gap-2">
+
+                    <div class="grid-item p-4 rounded-sm ring-1 ring-slate-200">
+                        <p class="text-xs uppercase tracking-wider text-slate-500">Voltajes por Línea [V]</p>
+                        <p class="mt-1 text-3xl font-extrabold">———</p>
+                            
+                        <div class="mt-4 overflow-hidden rounded-sm ring-1 ring-slate-200">   
+                            <table class="w-full border-collapse text-sm text-center">
+                                <thead class="bg-slate-50">
+                                    <tr>
+                                        <th class="font-semibold p-1">-</th>
+                                        <th class="font-semibold p-1">Max</th>
+                                        <th class="font-semibold p-1">Min</th>
+                                        <th class="font-semibold p-1">Prom</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="odd:bg-white even:bg-slate-50">
+                                        <td class="p-1"><b>VA</b></td>
+                                        <td class="p-1">141.10</td>
+                                        <td class="p-1">124.40</td>
+                                        <td class="p-1">132.02</td>
+                                    </tr>
+                                    <tr class="odd:bg-white even:bg-slate-50">
+                                        <td class="p-1"><b>VB</b></td>
+                                        <td class="p-1">140.20</td>
+                                        <td class="p-1">123.10</td>
+                                        <td class="p-1">132.28</td>
+                                    </tr>
+                                    <tr class="odd:bg-white even:bg-slate-50">
+                                        <td class="p-1"><b>VC</b></td>
+                                        <td class="p-1">144.20</td>
+                                        <td class="p-1">127.30</td>
+                                        <td class="p-1">136.20</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    
+                    </div>
+                                    
+                    <div class="grid-item p-4 rounded-sm ring-1 ring-slate-200">
+                        <p class="text-xs uppercase tracking-wider text-slate-500">Voltajes por Fase [V]</p>
+                        <p class="mt-1 text-3xl font-extrabold">———</p>
+                            
+                        <div class="mt-4 overflow-hidden rounded-sm ring-1 ring-slate-200">   
+                            <table class="w-full border-collapse text-sm text-center">
+                                <thead class="bg-slate-50">
+                                    <tr>
+                                        <th class="font-semibold p-1">-</th>
+                                        <th class="font-semibold p-1">Max</th>
+                                        <th class="font-semibold p-1">Min</th>
+                                        <th class="font-semibold p-1">Prom</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="odd:bg-white even:bg-slate-50">
+                                        <td class="p-1"><b>VAB</b></td>
+                                        <td class="p-1">243.20</td>
+                                        <td class="p-1">214.70</td>
+                                        <td class="p-1">229.81</td>
+                                    </tr>
+                                    <tr class="odd:bg-white even:bg-slate-50">
+                                        <td class="p-1"><b>VBC</b></td>
+                                        <td class="p-1">246.30</td>
+                                        <td class="p-1">218.80</td>
+                                        <td class="p-1">233.18</td>
+                                    </tr>
+                                    <tr class="odd:bg-white even:bg-slate-50">
+                                        <td class="p-1"><b>VCA</b></td>
+                                        <td class="p-1">247.20</td>
+                                        <td class="p-1">215.90</td>
+                                        <td class="p-1">232.28</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    
+                    </div>
+
+                    <div class="grid-item p-4 rounded-sm ring-1 ring-slate-200">
+                        <p class="text-xs uppercase tracking-wider text-slate-500">Frecuencia [Hz]</p>
+                        <p class="mt-1 text-3xl font-extrabold">———</p>
+                            
+                        <div class="mt-4 overflow-hidden rounded-sm ring-1 ring-slate-200">   
+                            <table class="w-full border-collapse text-sm text-center">
+                                <thead class="bg-slate-50">
+                                    <tr>
+                                        <th class="p-1 font-semibold p-1">-</th>
+                                        <th class="p-1 font-semibold p-1">Max</th>
+                                        <th class="p-1 font-semibold p-1">Min</th>
+                                        <th class="p-1 font-semibold p-1">Prom</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="odd:bg-white even:bg-slate-50">
+                                        <td class="p-1"><b>F</b></td>
+                                        <td class="p-1">60.06</td>
+                                        <td class="p-1">59.89</td>
+                                        <td class="p-1">59.98</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    
+                    </div>
+
+                </div>
+            </div>
+
+            <div section>
+                <h3 class="text-xl font-bold text-slate-900 mt-4">Alimentación Laboratorio 7</h3>
+                
+                <div class="mt-4 grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                    <div class="grid-item p-4 rounded-sm ring-1 ring-slate-200">
+                        <p class="text-xs uppercase tracking-wider text-slate-500">Voltajes por Fase [V]</p>
+                        <p class="mt-1 text-3xl font-extrabold">———</p>
+                            
+                        <div class="mt-4 overflow-hidden rounded-sm ring-1 ring-slate-200">   
+                            <table class="w-full border-collapse text-sm text-center">
+                                <thead class="bg-slate-50">
+                                    <tr>
+                                        <th class="font-semibold p-1">-</th>
+                                        <th class="font-semibold p-1">Max</th>
+                                        <th class="font-semibold p-1">Min</th>
+                                        <th class="font-semibold p-1">Prom</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="odd:bg-white even:bg-slate-50">
+                                        <td class="p-1"><b>VA</b></td>
+                                        <td class="p-1">117.20</td>
+                                        <td class="p-1">112.30</td>
+                                        <td class="p-1">115.2</td>
+                                    </tr>
+                                    <tr class="odd:bg-white even:bg-slate-50">
+                                        <td class="p-1"><b>VB</b></td>
+                                        <td class="p-1">116.6</td>
+                                        <td class="p-1">111.60</td>
+                                        <td class="p-1">114.67</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    
+                    </div>
+                                    
+                    <div class="grid-item p-4 rounded-sm ring-1 ring-slate-200">
+                        <p class="text-xs uppercase tracking-wider text-slate-500">Voltajes por Línea [V]</p>
+                        <p class="mt-1 text-3xl font-extrabold">———</p>
+                            
+                        <div class="mt-4 overflow-hidden rounded-sm ring-1 ring-slate-200">   
+                            <table class="w-full border-collapse text-sm text-center">
+                                <thead class="bg-slate-50">
+                                    <tr>
+                                        <th class="font-semibold p-1">-</th>
+                                        <th class="font-semibold p-1">Max</th>
+                                        <th class="font-semibold p-1">Min</th>
+                                        <th class="font-semibold p-1">Prom</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="odd:bg-white even:bg-slate-50">
+                                        <td class="p-1"><b>VAB</b></td>
+                                        <td class="p-1">233.50</td>
+                                        <td class="p-1">240.20</td>
+                                        <td class="p-1">229.79</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                    </div>
+                    
+                    </div>
+
+                    <div class="grid-item p-4 rounded-sm ring-1 ring-slate-200">
+                        <p class="text-xs uppercase tracking-wider text-slate-500">Corrientes por línea [A]</p>
+                        <p class="mt-1 text-3xl font-extrabold">———</p>
+                            
+                        <div class="mt-4 overflow-hidden rounded-sm ring-1 ring-slate-200">   
+                            <table class="w-full border-collapse text-sm text-center">
+                                <thead class="bg-slate-50">
+                                    <tr>
+                                        <th class="font-semibold p-1">-</th>
+                                        <th class="font-semibold p-1">Max</th>
+                                        <th class="font-semibold p-1">Min</th>
+                                        <th class="font-semibold p-1">Prom</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="odd:bg-white even:bg-slate-50">
+                                        <td class="p-1"><b>iA</b></td>
+                                        <td class="p-1">63.24</td>
+                                        <td class="p-1">2.33</td>
+                                        <td class="p-1">33.74</td>
+                                    </tr>
+                                    <tr class="odd:bg-white even:bg-slate-50">
+                                        <td class="p-1"><b>iB</b></td>
+                                        <td class="p-1">62.90</td>
+                                        <td class="p-1">2.32</td>
+                                        <td class="p-1">33.57</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                    </div>
+                    
+                    </div>
+
+                    <div class="grid-item p-4 rounded-sm ring-1 ring-slate-200">
+                        <p class="text-xs uppercase tracking-wider text-slate-500">Potencia Activa [W]</p>
+                        <p class="mt-1 text-3xl font-extrabold">———</p>
+                            
+                        <div class="mt-4 overflow-hidden rounded-sm ring-1 ring-slate-200">   
+                            <table class="w-full border-collapse text-sm text-center">
+                                <thead class="bg-slate-50">
+                                    <tr>
+                                        <th class="font-semibold p-1">-</th>
+                                        <th class="font-semibold p-1">Max</th>
+                                        <th class="font-semibold p-1">Min</th>
+                                        <th class="font-semibold p-1">Prom</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="odd:bg-white even:bg-slate-50">
+                                        <td class="p-1"><b>P</b></td>
+                                        <td class="p-1">14.08</td>
+                                        <td class="p-1">0.40</td>
+                                        <td class="p-1">7.35</td>
+                                    </tr>
+                                    <tr class="odd:bg-white even:bg-slate-50">
+                                        <td class="p-1"><b>PA</b></td>
+                                        <td class="p-1">7.08</td>
+                                        <td class="p-1">0.20</td>
+                                        <td class="p-1">3.69</td>
+                                    </tr>
+                                    <tr class="odd:bg-white even:bg-slate-50">
+                                        <td class="p-1"><b>PB</b></td>
+                                        <td class="p-1">7.00</td>
+                                        <td class="p-1">0.20</td>
+                                        <td class="p-1">3.66</td>
+                                    </tr>
+                                    
+                                </tbody>
+                            </table>
+                    </div>
+                    
+                    </div>
+
+                    <div class="grid-item p-4 rounded-sm ring-1 ring-slate-200">
+                        <p class="text-xs uppercase tracking-wider text-slate-500">Potencia Reactiva [VAR]</p>
+                        <p class="mt-1 text-3xl font-extrabold">———</p>
+                            
+                        <div class="mt-4 overflow-hidden rounded-sm ring-1 ring-slate-200">   
+                            <table class="w-full border-collapse text-sm text-center">
+                                <thead class="bg-slate-50">
+                                    <tr>
+                                        <th class="font-semibold p-1">-</th>
+                                        <th class="font-semibold p-1">Max</th>
+                                        <th class="font-semibold p-1">Min</th>
+                                        <th class="font-semibold p-1">Prom</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="odd:bg-white even:bg-slate-50">
+                                        <td class="p-1"><b>Q</b></td>
+                                        <td class="p-1">1.04</td>
+                                        <td class="p-1">0.08</td>
+                                        <td class="p-1">0.88</td>
+                                    </tr>
+                                    <tr class="odd:bg-white even:bg-slate-50">
+                                        <td class="p-1"><b>QA</b></td>
+                                        <td class="p-1">0.52</td>
+                                        <td class="p-1">0.04</td>
+                                        <td class="p-1">0.47</td>
+                                    </tr>
+                                    <tr class="odd:bg-white even:bg-slate-50">
+                                        <td class="p-1"><b>QB</b></td>
+                                        <td class="p-1">0.48</td>
+                                        <td class="p-1">0.04</td>
+                                        <td class="p-1">0.41</td>
+                                    </tr>
+                                    
+                                </tbody>
+                            </table>
+                    </div>
+                    
+                    </div>
+
+                    <div class="grid-item p-4 rounded-sm ring-1 ring-slate-200">
+                        <p class="text-xs uppercase tracking-wider text-slate-500">Potencia Aparente [VA]</p>
+                        <p class="mt-1 text-3xl font-extrabold">———</p>
+                            
+                        <div class="mt-4 overflow-hidden rounded-sm ring-1 ring-slate-200">   
+                            <table class="w-full border-collapse text-sm text-center">
+                                <thead class="bg-slate-50">
+                                    <tr>
+                                        <th class="font-semibold p-1">-</th>
+                                        <th class="font-semibold p-1">Max</th>
+                                        <th class="font-semibold p-1">Min</th>
+                                        <th class="font-semibold p-1">Prom</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="odd:bg-white even:bg-slate-50">
+                                        <td class="p-1"><b>S</b></td>
+                                        <td class="p-1">14.08</td>
+                                        <td class="p-1">0.40</td>
+                                        <td class="p-1">7.42</td>
+                                    </tr>
+                                    <tr class="odd:bg-white even:bg-slate-50">
+                                        <td class="p-1"><b>SA</b></td>
+                                        <td class="p-1">7.12</td>
+                                        <td class="p-1">0.20</td>
+                                        <td class="p-1">3.73</td>
+                                    </tr>
+                                    <tr class="odd:bg-white even:bg-slate-50">
+                                        <td class="p-1"><b>SB</b></td>
+                                        <td class="p-1">7.04</td>
+                                        <td class="p-1">0.20</td>
+                                        <td class="p-1">3.7</td>
+                                    </tr>
+                                    
+                                </tbody>
+                            </table>
+                        </div>
+                    
+                    </div>
+                    
+                    <div class="grid-item p-4 rounded-sm ring-1 ring-slate-200 mt-20">
+                        <p class="text-xs uppercase tracking-wider text-slate-500">Frecuencia [Hz]</p>
+                        <p class="mt-1 text-3xl font-extrabold">———</p>
+                            
+                        <div class="mt-4 overflow-hidden rounded-sm ring-1 ring-slate-200">   
+                            <table class="w-full border-collapse text-sm text-center">
+                                <thead class="bg-slate-50">
+                                    <tr>
+                                        <th class="p-1 font-semibold p-1">-</th>
+                                        <th class="p-1 font-semibold p-1">Max</th>
+                                        <th class="p-1 font-semibold p-1">Min</th>
+                                        <th class="p-1 font-semibold p-1">Prom</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="odd:bg-white even:bg-slate-50">
+                                        <td class="p-1"><b>F</b></td>
+                                        <td class="p-1">60.07</td>
+                                        <td class="p-1">59.90</td>
+                                        <td class="p-1">59.98</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                    </div>
+                    
+                    </div>
+                </div>
+            </div>
+            
+            <div section>
+                <h3 class="text-xl font-bold text-slate-900 mt-4">Alimentación Laboratorio 8</h3>
+                
+                <div class="mt-4 grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                    <div class="grid-item p-4 rounded-sm ring-1 ring-slate-200">
+                        <p class="text-xs uppercase tracking-wider text-slate-500">Voltajes por Fase [V]</p>
+                        <p class="mt-1 text-3xl font-extrabold">———</p>
+                            
+                        <div class="mt-4 overflow-hidden rounded-sm ring-1 ring-slate-200">   
+                            <table class="w-full border-collapse text-sm text-center">
+                                <thead class="bg-slate-50">
+                                    <tr>
+                                        <th class="font-semibold p-1">-</th>
+                                        <th class="font-semibold p-1">Max</th>
+                                        <th class="font-semibold p-1">Min</th>
+                                        <th class="font-semibold p-1">Prom</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="odd:bg-white even:bg-slate-50">
+                                        <td class="p-1"><b>VA</b></td>
+                                        <td class="p-1">117.10</td>
+                                        <td class="p-1">112.50</td>
+                                        <td class="p-1">115.34</td>
+                                    </tr>
+                                    <tr class="odd:bg-white even:bg-slate-50">
+                                        <td class="p-1"><b>VB</b></td>
+                                        <td class="p-1">117.10</td>
+                                        <td class="p-1">112.50</td>
+                                        <td class="p-1">115.42</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    
+                    </div>
+                                    
+                    <div class="grid-item p-4 rounded-sm ring-1 ring-slate-200">
+                        <p class="text-xs uppercase tracking-wider text-slate-500">Voltajes por Línea [V]</p>
+                        <p class="mt-1 text-3xl font-extrabold">———</p>
+                            
+                        <div class="mt-4 overflow-hidden rounded-sm ring-1 ring-slate-200">   
+                            <table class="w-full border-collapse text-sm text-center">
+                                <thead class="bg-slate-50">
+                                    <tr>
+                                        <th class="font-semibold p-1">-</th>
+                                        <th class="font-semibold p-1">Max</th>
+                                        <th class="font-semibold p-1">Min</th>
+                                        <th class="font-semibold p-1">Prom</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="odd:bg-white even:bg-slate-50">
+                                        <td class="p-1"><b>VAB</b></td>
+                                        <td class="p-1">233.80</td>
+                                        <td class="p-1">224.90</td>
+                                        <td class="p-1">230.66</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                    </div>
+                    
+                    </div>
+
+                    <div class="grid-item p-4 rounded-sm ring-1 ring-slate-200">
+                        <p class="text-xs uppercase tracking-wider text-slate-500">Corrientes por línea [A]</p>
+                        <p class="mt-1 text-3xl font-extrabold">———</p>
+                            
+                        <div class="mt-4 overflow-hidden rounded-sm ring-1 ring-slate-200">   
+                            <table class="w-full border-collapse text-sm text-center">
+                                <thead class="bg-slate-50">
+                                    <tr>
+                                        <th class="font-semibold p-1">-</th>
+                                        <th class="font-semibold p-1">Max</th>
+                                        <th class="font-semibold p-1">Min</th>
+                                        <th class="font-semibold p-1">Prom</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="odd:bg-white even:bg-slate-50">
+                                        <td class="p-1"><b>iA</b></td>
+                                        <td class="p-1">65.14</td>
+                                        <td class="p-1">1.95</td>
+                                        <td class="p-1">36.66</td>
+                                    </tr>
+                                    <tr class="odd:bg-white even:bg-slate-50">
+                                        <td class="p-1"><b>iB</b></td>
+                                        <td class="p-1">64.97</td>
+                                        <td class="p-1">1.95</td>
+                                        <td class="p-1">36.55</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                    </div>
+                    
+                    </div>
+
+                    <div class="grid-item p-4 rounded-sm ring-1 ring-slate-200">
+                        <p class="text-xs uppercase tracking-wider text-slate-500">Potencia Activa [W]</p>
+                        <p class="mt-1 text-3xl font-extrabold">———</p>
+                            
+                        <div class="mt-4 overflow-hidden rounded-sm ring-1 ring-slate-200">   
+                            <table class="w-full border-collapse text-sm text-center">
+                                <thead class="bg-slate-50">
+                                    <tr>
+                                        <th class="font-semibold p-1">-</th>
+                                        <th class="font-semibold p-1">Max</th>
+                                        <th class="font-semibold p-1">Min</th>
+                                        <th class="font-semibold p-1">Prom</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="odd:bg-white even:bg-slate-50">
+                                        <td class="p-1"><b>P</b></td>
+                                        <td class="p-1">14.56</td>
+                                        <td class="p-1">0.32</td>
+                                        <td class="p-1">7.99</td>
+                                    </tr>
+                                    <tr class="odd:bg-white even:bg-slate-50">
+                                        <td class="p-1"><b>PA</b></td>
+                                        <td class="p-1">7.28</td>
+                                        <td class="p-1">0.16</td>
+                                        <td class="p-1">4</td>
+                                    </tr>
+                                    <tr class="odd:bg-white even:bg-slate-50">
+                                        <td class="p-1"><b>PB</b></td>
+                                        <td class="p-1">7.28</td>
+                                        <td class="p-1">0.16</td>
+                                        <td class="p-1">4</td>
+                                    </tr>
+                                    
+                                </tbody>
+                            </table>
+                    </div>
+                    
+                    </div>
+
+                    <div class="grid-item p-4 rounded-sm ring-1 ring-slate-200">
+                        <p class="text-xs uppercase tracking-wider text-slate-500">Potencia Reactiva [VAR]</p>
+                        <p class="mt-1 text-3xl font-extrabold">———</p>
+                            
+                        <div class="mt-4 overflow-hidden rounded-sm ring-1 ring-slate-200">   
+                            <table class="w-full border-collapse text-sm text-center">
+                                <thead class="bg-slate-50">
+                                    <tr>
+                                        <th class="font-semibold p-1">-</th>
+                                        <th class="font-semibold p-1">Max</th>
+                                        <th class="font-semibold p-1">Min</th>
+                                        <th class="font-semibold p-1">Prom</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="odd:bg-white even:bg-slate-50">
+                                        <td class="p-1"><b>Q</b></td>
+                                        <td class="p-1">1.36</td>
+                                        <td class="p-1">0.08</td>
+                                        <td class="p-1">1.25</td>
+                                    </tr>
+                                    <tr class="odd:bg-white even:bg-slate-50">
+                                        <td class="p-1"><b>QA</b></td>
+                                        <td class="p-1">0.72</td>
+                                        <td class="p-1">0.04</td>
+                                        <td class="p-1">0.63</td>
+                                    </tr>
+                                    <tr class="odd:bg-white even:bg-slate-50">
+                                        <td class="p-1"><b>QB</b></td>
+                                        <td class="p-1">0.68</td>
+                                        <td class="p-1">0.04</td>
+                                        <td class="p-1">0.61</td>
+                                    </tr>
+                                    
+                                </tbody>
+                            </table>
+                    </div>
+                    
+                    </div>
+
+                    <div class="grid-item p-4 rounded-sm ring-1 ring-slate-200">
+                        <p class="text-xs uppercase tracking-wider text-slate-500">Potencia Aparente [VA]</p>
+                        <p class="mt-1 text-3xl font-extrabold">———</p>
+                            
+                        <div class="mt-4 overflow-hidden rounded-sm ring-1 ring-slate-200">   
+                            <table class="w-full border-collapse text-sm text-center">
+                                <thead class="bg-slate-50">
+                                    <tr>
+                                        <th class="font-semibold p-1">-</th>
+                                        <th class="font-semibold p-1">Max</th>
+                                        <th class="font-semibold p-1">Min</th>
+                                        <th class="font-semibold p-1">Prom</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="odd:bg-white even:bg-slate-50">
+                                        <td class="p-1"><b>S</b></td>
+                                        <td class="p-1">14.56</td>
+                                        <td class="p-1">0.32</td>
+                                        <td class="p-1">8.14</td>
+                                    </tr>
+                                    <tr class="odd:bg-white even:bg-slate-50">
+                                        <td class="p-1"><b>SA</b></td>
+                                        <td class="p-1">7.28</td>
+                                        <td class="p-1">0.16</td>
+                                        <td class="p-1">4.07</td>
+                                    </tr>
+                                    <tr class="odd:bg-white even:bg-slate-50">
+                                        <td class="p-1"><b>SB</b></td>
+                                        <td class="p-1">7.28</td>
+                                        <td class="p-1">0.16</td>
+                                        <td class="p-1">4.07</td>
+                                    </tr>
+                                    
+                                </tbody>
+                            </table>
+                    </div>
+                    
+                    </div>
+
+                    <div class="grid-item p-4 rounded-sm ring-1 ring-slate-200">
+                        <p class="text-xs uppercase tracking-wider text-slate-500">Frecuencia [Hz]</p>
+                        <p class="mt-1 text-3xl font-extrabold">———</p>
+                            
+                        <div class="mt-4 overflow-hidden rounded-sm ring-1 ring-slate-200">   
+                            <table class="w-full border-collapse text-sm text-center">
+                                <thead class="bg-slate-50">
+                                    <tr>
+                                        <th class="p-1 font-semibold p-1">-</th>
+                                        <th class="p-1 font-semibold p-1">Max</th>
+                                        <th class="p-1 font-semibold p-1">Min</th>
+                                        <th class="p-1 font-semibold p-1">Prom</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="odd:bg-white even:bg-slate-50">
+                                        <td class="p-1"><b>F</b></td>
+                                        <td class="p-1">60.07</td>
+                                        <td class="p-1">59.90</td>
+                                        <td class="p-1">59.98</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                    </div>
+                    
+                    </div>
+                </div>
+            </div>
+        </div>
+       
+        <div class="page-break"></div>
+        <div class="pt-20">
+            <h2 class="text-2xl font-bold text-slate-900 mt-4">2. Gráficas de comportamiento</h2>
+            <p class="mt-4 text-slate-700 leading-relaxed text-sm">
+            En las siguientes gráficas se puede revisar el comportamiento que han tenido los parámetros básicos de voltaje y corriente, para cada uno de los circuitos del proyecto
+            </p>  
+            <div section>
+                    <h3 class="text-xl font-bold text-slate-900 mt-4">Entrada Empresa Eléctrica</h3>
+                    
+                    <div class="mt-4 grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-1 gap-4">
+                        
+                        <div class="grid-item p-4 rounded-sm ring-1 ring-slate-200">
+                            <p class="text-xs uppercase tracking-wider text-slate-500 mt-4">Voltajes por fase</p>
+                            <p class="mt-1 text-3xl font-extrabold">———</p>
+                            <img src="/OnDemand/uS/generate_report/static/img/v1.png" alt="V_circuito_1" class="h-300px">
+                        </div> 
+
+                    </div>
+            </div>
+            <div class="page-break"></div>
+
+            <div class="pt-20">
+                    <h3 class="text-xl font-bold text-slate-900 mt-4">Alimentación Laboratorio 7</h3>
+
+                    <div class="mt-4 grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-1 gap-4">
+                        
+                        <div class="grid-item p-4 rounded-sm ring-1 ring-slate-200">
+                            <p class="text-xs uppercase tracking-wider text-slate-500 mt-4">Voltajes por fase</p>
+                            <p class="mt-1 text-3xl font-extrabold">———</p>
+                            <img src="/OnDemand/uS/generate_report/static/img/v2.png" alt="V_circuito_2" class="h-300px">
+                        </div>
+
+                        <div class="grid-item p-4 rounded-sm ring-1 ring-slate-200">
+                            <p class="text-xs uppercase tracking-wider text-slate-500 mt-4">Corrientes por fase</p>
+                            <p class="mt-1 text-3xl font-extrabold">———</p>
+                            <img src="/OnDemand/uS/generate_report/static/img/i2.png" alt="I_circuito_2" class="h-300px">
+                        </div>              
+                    </div>
+            </div>
+            <div class="page-break"></div>
+            <div class="pt-20">
+                    <h3 class="text-xl font-bold text-slate-900 mt-4">Alimentación Laboratorio 8</h3>
+
+                    <div class="mt-4 grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-1 gap-4">
+                        
+                        <div class="grid-item p-4 rounded-sm ring-1 ring-slate-200">
+                            <p class="text-xs uppercase tracking-wider text-slate-500 mt-4">Voltajes por fase</p>
+                            <p class="mt-1 text-3xl font-extrabold">———</p>
+                            <img src="/OnDemand/uS/generate_report/static/img/v3.png" alt="V_circuito_3" class="h-max">
+                        </div>
+                        
+                        <div class="grid-item p-4 rounded-sm ring-1 ring-slate-200">
+                            <p class="text-xs uppercase tracking-wider text-slate-500 mt-4">Corrientes por fase</p>
+                            <p class="mt-1 text-3xl font-extrabold">———</p>
+                            <img src="/OnDemand/uS/generate_report/static/img/i3.png" alt="I_circuito_3" class="h-400px">
+                        </div>              
+                    </div>
+            </div>
+        </div>
+        
+        <div class="page-break"></div>
+        <!-- Sección de alarmas (contenido variable) -->
+        <div class="pt-20">
+             <h2 class="mt-4 text-2xl font-bold text-slate-900">3. Alarmas ocurridas</h2>
+                <!--
+                <div class="mt-4 overflow-hidden rounded-sm ring-1 ring-slate-200">   
+                    <table class="w-full border-collapse text-sm">
+                        <thead class="bg-slate-50">
+                            <tr>
+                                <th class="text-left font-semibold p-3">#</th>
+                                <th class="text-left font-semibold p-3">Circuito</th>
+                                <th class="text-left font-semibold p-3">Regla rota</th>
+                                <th class="text-left font-semibold p-3">Primer evento</th>
+                                <th class="text-left font-semibold p-3">Último evento</th>
+                                <th class="text-left font-semibold p-3">Número de incidencias</th>
+                            </tr>
+                        </thead>
+                    <tbody>
+                        <tr class="odd:bg-white even:bg-slate-50">
+                            <td class="p-3">1</td>
+                            <td class="p-3">Entrada Empresa Eléctrica</td>
+                            <td class="p-3">VA=!0</td>
+                            <td class="p-3">15/10/2025 17:30</td>
+                            <td class="p-3">15/10/2025 17:30</td>
+                            <td class="p-3">1</td>
+                        </tr>
+                        <tr class="odd:bg-white even:bg-slate-50">
+                            <td class="p-3">2</td>
+                            <td class="p-3">Entrada Empresa Eléctrica</td>
+                            <td class="p-3">VB=!0</td>
+                            <td class="p-3">15/10/2025 17:30</td>
+                            <td class="p-3">15/10/2025 17:30</td>
+                            <td class="p-3">1</td>
+                        </tr>
+                        <tr class="odd:bg-white even:bg-slate-50">
+                            <td class="p-3">3</td>
+                            <td class="p-3">Entrada Empresa Eléctrica</td>
+                            <td class="p-3">VC=!0</td>
+                            <td class="p-3">15/10/2025 17:30</td>
+                            <td class="p-3">15/10/2025 17:30</td>
+                            <td class="p-3">1</td>
+                        </tr>
+                    </tbody>
+                    </table>
+                </div>
+            -->
+            <p class="mt-4 text-slate-500 italic">No se registraron alarmas en el periodo.</p>
+            <!--{% endif %}-->
+        </div>
+        
+        <!-- Sección de gráficas de eventos (contenido variable) -->
+        <div>
+            <h2 class="mt-4 text-2xl font-bold text-slate-900 ">4. Comportamientos anormales</h2>
+            <p class="mt-4 text-sm text-slate-600">
+                En caso de haberse presentado alguna eventualidad, esta fue notificada oportunamente a 
+                través del sistema automatizado de monitoreo. 
+                
+                <!-- El comportamiento de los parámetros eléctricos asociados a dicho evento se muestra en las siguientes gráficas.-->
+            </p> 
+
+            <!--
+            <div class="mt-6 p-4 border border-slate-200 rounded-sm">
+                <p class="text-xs uppercase tracking-wider text-slate-500">Voltaje en fase</p>
+                <img src="/OnDemand/uS/generate_report/static/img/graph.png" alt="Gráfica" class="mt-3 w-full">
+            </div>
+            -->
+        </div>
+        
+        
+        <!-- PAGINA FINAL -->
+        <!-- Anexos -->
+        <div class="page-break"></div>
+        <div class="pt-20">
+            <h2 class="text-2xl font-bold text-slate-900">5. Anexos</h2>
+            <p class="mt-4 text-sm text-slate-600">En los siguientes archivos podrá encontrar la información completa que fue resumida en este informe.</p>
+            <ul class="mt-4 list-disc pl-6 text-slate-700 text-sm">
+                <li>Registro completo de las mediciones (<a href="\LabRI_005_1225_M3.zip">LabRI_005_1225.zip</a>).</li>
+                <!--<li>Registro de alarmas emitidas(csv).</li>-->
+            </ul>
+        </div>
+
+        <!-- Mensaje final -->
+        <div class="mt-16 flex items-center justify-center gap-3 text-sm text-slate-500">
+            <div>
+                <p class="mt-4 text-slate-700 leading-relaxed">
+                    En caso de necesitar mayor explicación o detalle de lo incluido en este informe, por favor comuniquese con su provedor de servicio <b>Premium Energía SAS</b>
+                </p>
+                <p class="mt-4 text-slate-700 leading-relaxed">
+                    <b>Técnico Responsable: </b>
+                </p>
+                <p>Ing. Jeramhil Javier Solis Yari</p>
+                <p>proyectos@premium-energia.com</p>
+                <p>0984373697</p>
+            </div>
+        </div>
+
+    
+        
+    </main>
+
+    <!-- Pie de página -->
+    <footer class="footer flex justify-between items-center border-t border-slate-200 px-8 py-2 bg-white text-xs text-slate-500">
+        <p>© PowerView by Powerex - Developed by Corso Insight Solutions</p>
+        <!--<p>Página <span class="page-number"></span></p>-->
+    </footer>
+
+    <!-- Salto de página <div class="page-break"></div>-->
+    
+</body>
+</html>

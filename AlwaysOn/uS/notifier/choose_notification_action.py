@@ -1,0 +1,67 @@
+import httpx
+from typing import Optional, Dict, Any,List
+import logging
+from datetime import datetime
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger('notification_dispatcher') 
+
+GATEWAY_URL = "http://127.0.0.1:8000/permanent/alarm_processing"  # URL del endpoint del gateway
+
+
+async def fetch_events_timestamps(event_id:int,notif_reg_data:Dict[str,Any],client:httpx.AsyncClient)->Optional[List[Dict[str,Any]]]:
+    try:
+        notification_triggers_ts = await client.get(
+                f"{GATEWAY_URL}/fetch_events_ts/",
+                params={"current_event_id":event_id,"last_trigger_id":notif_reg_data['lt'], "last_notif_id":notif_reg_data['ln']}
+        )
+
+        notification_triggers_ts.raise_for_status()
+        timestamps_per_id=notification_triggers_ts.json() #Lista de diccionarios de {id:int,timestamp: str iso}
+
+        return timestamps_per_id if timestamps_per_id else None
+    
+    except:
+        logger.error('Something went wrong while obtaining the timestamps of the relevant events')
+        return None
+
+async def calculate_time_between_events(relevant_events_ts:List[Dict[str,Any]]):
+
+    new_event_ts=datetime.fromisoformat(relevant_events_ts[0]['timestamp'])
+    last_trigger_ts=datetime.fromisoformat(relevant_events_ts[1]['timestamp'])
+    last_notif_ts=datetime.fromisoformat(relevant_events_ts[2]['timestamp'])
+    
+    diff_ne_lt=((new_event_ts-last_trigger_ts).total_seconds())/60 #Diferencia de tiempo entre el evento evaluado y la última vez que se rompió esta regla en minutos
+    diff_ne_ln=((new_event_ts-last_notif_ts).total_seconds())/60 #Diferencia de tiempo entre el evento evaluado y la última vez que se notificó en minutos
+
+    return {
+        'event_vs_last_trigger':diff_ne_lt,
+        'event_vs_last_notif':diff_ne_ln,
+    }
+
+async def evaluate_register(event_id:int,notif_reg_data:Dict[str,Any],client:httpx.AsyncClient)->Optional[str]: #Revisa el registro previo del evento para saber qué hacer
+    #logger.info(f' Última notificación registrada: {notif_reg_data}')
+    #1ro obtener los timestamps para poder comparar los tiempos
+    relevant_events_ts=await fetch_events_timestamps(event_id,notif_reg_data,client)
+    
+    logger.info (f' CE tp: {relevant_events_ts[0]}, LT tp: {relevant_events_ts[1]}, LN tp: {relevant_events_ts[2]}')
+
+    #2do calcular cuanto tiempo ha pasado entre el evento nuevo y los triggers relevantes
+    time_differences=await calculate_time_between_events(relevant_events_ts)
+    logger.info (f'Time between events: {time_differences}')
+
+    #3ro comparar los tiempos resultados con los tiempos establecidos de decisión
+
+    time_notif=5 #5 min de espera para volver a enviar una notificación
+    time_new_event=15 #Debe ser tomado como un evento nuevo desde cero
+    
+    time_last_trigger=time_differences['event_vs_last_trigger'] #Hace cuanto saltó el último trigger (Incluso sin ser notificado)
+    time_last_notif=time_differences['event_vs_last_notif'] #Hace cuánto fue la última notificación
+
+    if time_last_trigger>=time_new_event: 
+        return "Create"
+
+    if time_last_notif<time_notif: #Hay que actualizar el contador de eventos y el trigger pero no notificar
+        return 'Update'
+    
+    elif time_last_notif>=time_notif: #Hay que actualizar el contador, trigger y notificar otra vez
+        return 'Remind'
