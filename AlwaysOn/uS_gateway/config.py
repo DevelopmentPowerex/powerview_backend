@@ -10,5 +10,5 @@ def env_int(name: str, default: int) -> int:
 class Settings:
     env: str = os.getenv("ENV", "local")
     log_level: str = os.getenv("LOG_LEVEL", "INFO").upper()
-    rabbit_thread:str = os.getenv("RABBIT_THREAD", 'EV_SEND').upper()
+    rabbit_thread:str = os.getenv("RABBIT_THREAD", 'EV_SEND')
 settings = Settings()

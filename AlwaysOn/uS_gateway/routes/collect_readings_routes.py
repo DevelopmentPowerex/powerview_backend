@@ -16,8 +16,11 @@ async def receive_lecture(lecture:EntireMeasure): #Recibo la lectura procesada d
     try:
         result = await MQTTReadingCollector.save_reading(lecture)
         return result  
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+    except ValueError as e:
+        raise HTTPException(400, detail=str(e))
+    except Exception:
+        logger.exception("Unexpected error in save_new_reading")
+        raise HTTPException(500, detail="Internal server error")
 
 
 
