@@ -1,15 +1,23 @@
 import asyncio
-import logging
+
 from typing import Dict, Any, Optional
 import httpx
 
 from AlwaysOn.uS.notifier.fetch_notification_details import get_notification_data
 from AlwaysOn.uS.notifier.email.send_email import notify_by_email
 
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger('send_notification')
+from dotenv import load_dotenv
+load_dotenv(".env.local")
 
-async def notify_method(final_notif_data:Dict[str,Any],counter_notif:int)->bool:
+from config import settings
+from shared.logging_config import setup_logging
+
+setup_logging(settings.log_level)
+
+import logging
+logger = logging.getLogger(__name__)
+
+async def notify_method(final_notif_data:Dict[str,Any],counter_notif:int)->Optional[bool]:
     try:
         notif_channel=final_notif_data['receiver_data']['channel']
 
@@ -28,8 +36,9 @@ async def notify_method(final_notif_data:Dict[str,Any],counter_notif:int)->bool:
     
     except:
         logger.exception('Something went wrong while reading the notification channel')
+        return None
 
-async def send_notification(event_id:int,client:httpx.AsyncClient,counter_notif:int)->bool:
+async def send_notification(event_id:int,client:httpx.AsyncClient,counter_notif:int)->Optional[bool]:
     
     notification_data=await get_notification_data(event_id,client)
     

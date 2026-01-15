@@ -1,20 +1,26 @@
 import httpx
 from typing import Optional, Dict, Any,List
-import logging
+
 from datetime import datetime
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger('notification_dispatcher') 
 
-GATEWAY_URL = "http://127.0.0.1:8000/permanent/alarm_processing"  # URL del endpoint del gateway
+from dotenv import load_dotenv
+load_dotenv(".env.local")
 
+from config import settings
+from shared.logging_config import setup_logging
+
+setup_logging(settings.log_level)
+
+import logging
+logger = logging.getLogger(__name__)
 
 async def fetch_events_timestamps(event_id:int,notif_reg_data:Dict[str,Any],client:httpx.AsyncClient)->Optional[List[Dict[str,Any]]]:
     try:
         notification_triggers_ts = await client.get(
-                f"{GATEWAY_URL}/fetch_events_ts/",
+                f"{settings.gateway_url}/fetch_events_ts/",
                 params={"current_event_id":event_id,"last_trigger_id":notif_reg_data['lt'], "last_notif_id":notif_reg_data['ln']}
         )
-
+ 
         notification_triggers_ts.raise_for_status()
         timestamps_per_id=notification_triggers_ts.json() #Lista de diccionarios de {id:int,timestamp: str iso}
 
@@ -43,11 +49,11 @@ async def evaluate_register(event_id:int,notif_reg_data:Dict[str,Any],client:htt
     #1ro obtener los timestamps para poder comparar los tiempos
     relevant_events_ts=await fetch_events_timestamps(event_id,notif_reg_data,client)
     
-    logger.info (f' CE tp: {relevant_events_ts[0]}, LT tp: {relevant_events_ts[1]}, LN tp: {relevant_events_ts[2]}')
+    logger.debug (f' CE tp: {relevant_events_ts[0]}, LT tp: {relevant_events_ts[1]}, LN tp: {relevant_events_ts[2]}')
 
     #2do calcular cuanto tiempo ha pasado entre el evento nuevo y los triggers relevantes
     time_differences=await calculate_time_between_events(relevant_events_ts)
-    logger.info (f'Time between events: {time_differences}')
+    logger.debug (f'Time between events: {time_differences}')
 
     #3ro comparar los tiempos resultados con los tiempos establecidos de decisión
 

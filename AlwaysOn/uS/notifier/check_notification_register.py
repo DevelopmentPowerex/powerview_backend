@@ -1,11 +1,16 @@
 import httpx
 from typing import Optional, Dict, Any
+
+from dotenv import load_dotenv
+load_dotenv(".env.local")
+
+from config import settings
+from shared.logging_config import setup_logging
+
+setup_logging(settings.log_level)
+
 import logging
-
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger('register_check') 
-
-GATEWAY_URL = "http://127.0.0.1:8000/permanent/alarm_processing"  # URL del endpoint del gateway
+logger = logging.getLogger(__name__)
 
 async def check_register(event_id:int,client:httpx.AsyncClient)-> Optional[tuple[str,int]]: 
     #Revisa si el id (la última alarma registrada en rabbit) ya fue guardado en tabla de notificaciones
@@ -14,7 +19,7 @@ async def check_register(event_id:int,client:httpx.AsyncClient)-> Optional[tuple
     try:
              
         notification_register = await client.get(
-            f"{GATEWAY_URL}/check_alarms_register/",
+            f"{settings.gateway_url}/check_alarms_register/",
             params={"event_id": event_id}
         )
 

@@ -1,17 +1,21 @@
 import httpx
 from typing import Optional, Dict, Any,List
+
+from dotenv import load_dotenv
+load_dotenv(".env.local")
+
+from config import settings
+from shared.logging_config import setup_logging
+
+setup_logging(settings.log_level)
+
 import logging
-
-GATEWAY_URL = "http://127.0.0.1:8000/permanent/alarm_processing"  # URL del endpoint del gateway
-
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger('notif_details') 
-
+logger = logging.getLogger(__name__)
 
 async def get_event_data(event_to_notify:int,client:httpx.AsyncClient)-> Optional[Dict[str,Any]]:
     try:
         event = await client.get(
-            f"{GATEWAY_URL}/fetch_event_details/",
+            f"{settings.gateway_url}/fetch_event_details/",
             params={"details_for": event_to_notify}
         )
         event.raise_for_status()
@@ -41,7 +45,7 @@ async def get_recipients(meter_id:int,notif_channel:str,client:httpx.AsyncClient
                 channel_path="/fetch_recipients_number/"
 
         recipients=await client.get(
-            f"{GATEWAY_URL}{channel_path}",
+            f"{settings.gateway_url}{channel_path}",
             params={"meter_id": meter_id}
         )
 
@@ -61,7 +65,7 @@ async def get_recipients(meter_id:int,notif_channel:str,client:httpx.AsyncClient
 async def get_receiver_data(meter_id:int,client:httpx.AsyncClient)-> Optional[Dict[str,Any]]:
 
     nicknames=await client.get(
-        f"{GATEWAY_URL}/fetch_nicknames/",
+        f"{settings.gateway_url}/fetch_nicknames/",
         params={"meter_id": meter_id}
     )
     nicknames.raise_for_status()

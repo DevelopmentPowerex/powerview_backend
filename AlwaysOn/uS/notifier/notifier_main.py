@@ -11,17 +11,23 @@ from AlwaysOn.uS.notifier.update_register import update_counters
 from AlwaysOn.uS.notifier.send_notification import send_notification
 from AlwaysOn.uS.notifier.update_register import new_reg_notification, remind_event,update_counters
 
-GATEWAY_URL = "http://127.0.0.1:8000/permanent/alarm_processing"  # URL del endpoint del gateway
+from dotenv import load_dotenv
+load_dotenv(".env.local")
 
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger('notify_main') #Logger específico para Notificaciones
+from config import settings
+from shared.logging_config import setup_logging
+
+setup_logging(settings.log_level)
+
+import logging
+logger = logging.getLogger(__name__)
 
 async def obtain_event_id()-> Optional[int]:#Obtener id de le medición a evaluar
     #Leer el último id publicado en el queue para alarmas de rabbit
     try:
-        recent_event_id=await read_id('NOTIF') #Llamar a la función externa para obtener el id
+        recent_event_id=await read_id(settings.rabbit_thread) #Llamar a la función externa para obtener el id
         just_id=recent_event_id[0][recent_event_id[1]]
-        logger.info(f"New alarm event: {just_id}")
+        logger.debug(f"New alarm event: {just_id}")
         return just_id
     except Exception as e:
         logger.error(f'Error reading the id for the latest event {e}')
@@ -33,10 +39,10 @@ async def process_event(new_event_id:int,client:httpx.AsyncClient):
                   
     if registered_notification: 
 
-        logger.info(f'Broken rule:{registered_notification["rule"]}. First event:{registered_notification["ft"]} Last event:{registered_notification["lt"]} #:{registered_notification["counter"]} Last Alarm:{registered_notification["ln"]}')      
+        logger.debug(f'Broken rule:{registered_notification["rule"]}. First event:{registered_notification["ft"]} Last event:{registered_notification["lt"]} #:{registered_notification["counter"]} Last Alarm:{registered_notification["ln"]}')      
         
         notify_decision= await evaluate_register(new_event_id,registered_notification,client) #Decidir si lo ocurrido debe notificarse o no 
-        logger.info(f' Event has to be {notify_decision}')
+        logger.debug(f' Event has to be {notify_decision}')
         
         if (notify_decision != "Create") and (notify_decision is not None):
             
@@ -72,7 +78,7 @@ async def main():
                                     event_proccessed= await new_reg_notification(new_event_id,notification_counter,client)   
 
                                 
-                        logger.info(f'Event {new_event_id} processed succesfully')
+                        logger.debug(f'Event {new_event_id} processed succesfully')
 
                 except Exception as e:
                     logger.error(f'Unexpected error in main process: {e}')

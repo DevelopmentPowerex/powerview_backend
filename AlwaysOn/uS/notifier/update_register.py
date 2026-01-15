@@ -1,11 +1,16 @@
 from typing import Optional, Any, Dict
 import httpx
+
+from dotenv import load_dotenv
+load_dotenv(".env.local")
+
+from config import settings
+from shared.logging_config import setup_logging
+
+setup_logging(settings.log_level)
+
 import logging
-
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger('notify_register') #Logger específico para Notificaciones
-
-GATEWAY_URL = "http://127.0.0.1:8000/permanent/alarm_processing"
+logger = logging.getLogger(__name__)
 
 async def new_reg_notification(event_id:int,event_counter:int,client:httpx.AsyncClient): #Registrar en la DB la notificación enviada
 
@@ -16,12 +21,12 @@ async def new_reg_notification(event_id:int,event_counter:int,client:httpx.Async
 
     try:
         register_notification_sent = await client.post(
-                    f"{GATEWAY_URL}/register_notification/",
+                    f"{settings.gateway_url}/register_notification/",
                     json=new_register
                 )
         
         register_notification_sent.raise_for_status()
-        logger.info(f"Sent event {event_id} for registering the new event notification")
+        logger.debug(f"Sent event {event_id} for registering the new event notification")
         return register_notification_sent.status_code == 200        
     
     except httpx.HTTPError as e:
@@ -38,16 +43,16 @@ async def update_counters(notif_id:int,event_id:int,client:httpx.AsyncClient):
     }
 
     try:
-        logger.info(f"Updating Notification {notif_id} counter and trigger")
+        logger.debug(f"Updating Notification {notif_id} counter and trigger")
         response = await client.post(
-                    f"{GATEWAY_URL}/update_incidents_counter/",
+                    f"{settings.gateway_url}/update_incidents_counter/",
                     json=update_info
                 )
         
         response.raise_for_status()
         data = response.json()
 
-        return data['new_count']
+        return data.get('new_count')
 
     
     except httpx.HTTPError as e:
@@ -63,16 +68,15 @@ async def remind_event(notif_id:int,event_id:int,client:httpx.AsyncClient):
     }
 
     try:
-        logger.info(f"Updating Notification register {event_id} as the last succesfully notified")
+        logger.debug(f"Updating Notification register {event_id} as the last succesfully notified")
         response = await client.post(
-                    f"{GATEWAY_URL}/update_last_notif/",
+                    f"{settings.gateway_url}/update_last_notif/",
                     json=update_notif
                 )
         
         response.raise_for_status()
 
-
-        logger.info(f"Sent event {event_id} for registering the new event notification")
+        logger.debug(f"Sent event {event_id} for registering the new event notification")
         
         return response.status_code == 200        
 
