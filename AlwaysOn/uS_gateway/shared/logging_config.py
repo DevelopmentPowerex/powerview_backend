@@ -10,9 +10,8 @@ def setup_logging(level: str = "INFO") -> None:
         level=level_value,
         format=LOG_FORMAT,
         datefmt=DATE_FORMAT,
-        force=True,  # asegura el formato aunque algo ya configuró logging
+        force=True,
     )
 
-    # opcional: reduce ruido de libs
     logging.getLogger("httpx").setLevel(logging.WARNING)
     logging.getLogger("httpcore").setLevel(logging.WARNING)

@@ -1,18 +1,19 @@
 from DB.models.alarms import AlarmRule, AlarmEvent
-from DB.models.devices import Meter,ParametersPVM3
+from DB.models.devices import ParametersPVM3
 from DB.models.measurements import Measurement
-from DB.enums import Comparators
 from DB.database import async_session
 from AlwaysOn.rabbit.rabbit_func import send_id
 
-from typing import Dict, Any, Optional, List
+from typing import Any, Optional, List
 
 import logging
 from sqlalchemy.future import select
 from sqlalchemy import Float, and_, func
 
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger('GTW_evaluator')
+from ..config import settings
+
+import logging
+logger = logging.getLogger(__name__)
 
 class ReadingEvaluator:
     async def fetch_rules(measure_id: int) -> Optional[List[AlarmRule]]:
@@ -36,7 +37,6 @@ class ReadingEvaluator:
                 
                 required_params = [rule.parameter for rule in rules]
                 
-
                 stmt_param_codes = select(ParametersPVM3.id, ParametersPVM3.param_code).where(
                     ParametersPVM3.id.in_(required_params)
                 )
@@ -72,7 +72,7 @@ class ReadingEvaluator:
     async def send_event_MQ(event_list:List[Any])->bool:
         try:    
             for event in event_list:                        
-                await send_id('EV_SEND',event.id)
+                await send_id(settings.rabbit_thread,event.id)
             return True
         except:
             return False
