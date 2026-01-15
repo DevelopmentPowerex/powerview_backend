@@ -124,7 +124,7 @@ async def send_measure(measurement_data: Dict[str, Any],httpx_client:httpx.Async
     try:
         #Enviar datos de medición
         measurement_response = await httpx_client.post(
-            f"{settings.gateway_url}/save_new_reading/",
+            f"{settings.gateway_url}/save_new_reading",
             json=measurement_data
         )
         measurement_response.raise_for_status()
