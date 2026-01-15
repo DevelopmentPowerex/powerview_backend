@@ -1,31 +1,28 @@
 #uS dedicado a evaluar las reglas de alarmas por cada escritura en la DB
 from AlwaysOn.rabbit.rabbit_func import read_id
 
-import logging
 from typing import Dict, Any, Optional
 import asyncio
 import httpx
 
-import operator
+from protocols.operators_list import operators
+from protocols.endpoints import SAVE_NEW_EVENT_ENDPOINT, GET_RULES_ENDPOINT
 
-GATEWAY_URL = "http://127.0.0.1:8000/permanent/rule_evaluator"  # URL del endpoint del gateway interno
+from dotenv import load_dotenv
+load_dotenv(".env.local")
 
-operators={
-    '<' : operator.lt,
-    '<=' : operator.le,
-    '>' : operator.gt,
-    '>=' : operator.ge,
-    '=' : operator.eq,
-    '!=' : operator.ne
-}
+from config import settings
+from shared.logging_config import setup_logging
 
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger('evaluator') #Logger específico para Evaluador de Alarmas
+setup_logging(settings.log_level)
+
+import logging
+logger = logging.getLogger(__name__)
 
 async def obtain_id()-> Optional[int]:#Obtener id de le medición a evaluar
     #Leer el último id publicado en el queue para alarmas de rabbit
     try:
-        recent_measure_id=await read_id('EV_RECV') #Llamar a la función externa para obtener el id
+        recent_measure_id=await read_id(settings.rabbit_thread) #Llamar a la función externa para obtener el id
         just_id=recent_measure_id[0][recent_measure_id[1]]
         return just_id
     except Exception as e:
@@ -35,10 +32,10 @@ async def obtain_id()-> Optional[int]:#Obtener id de le medición a evaluar
 async def obtain_rules(received_id:int,client: httpx.AsyncClient)->Optional[dict[str,Any]]: #Con id obtenido, traemos las reglas
 
     try:
-        logger.info(f'Sent id {received_id} for extracting the rules')      
+        logger.debug(f'Sent id {received_id} for extracting the rules')      
         
         response = await client.get(
-            f"{GATEWAY_URL}/get_rules/",
+            f"{settings.gateway_url}{GET_RULES_ENDPOINT}",
             params={"request": received_id}
         )
 
@@ -46,13 +43,20 @@ async def obtain_rules(received_id:int,client: httpx.AsyncClient)->Optional[dict
         response_data=response.json()
 
         if not response_data:
-            logger.info(f'No rules returned for Measure id: {received_id}')    
+            logger.debug(f'No rules returned for Measure id: {received_id}')    
             return None
 
-        rules=response_data['rules']
-        parameters=response_data['param_values']
+        rules=response_data.get('rules',None)
+        if not rules:
+            logger.warning(f'Measure id: {received_id} returned no rules')      
+            return None
+        
+        parameters=response_data.get('param_values',None)
+        if not rules:
+            logger.warning(f'Measure id: {received_id} returned no parameters')     
+        
+        logger.debug(f'Measure id: {received_id} returned {len(rules)} rules')      
 
-        logger.info(f'Measure id: {received_id} returned {len(rules)} rules')      
         return {
             'measure_id':received_id,
             'rules': rules,
@@ -78,25 +82,34 @@ async def rule_evaluator(data_for_ev:dict[str,Any])->Optional[Dict[str,Any]]: #L
             comparator = rule['comparator']
             threshold = rule['threshold']
             id=rule['id']
+
             current_value = parameters.get(param_name)
-            compare_func = operators.get(comparator)
+            if current_value is None:
+                logger.warning(f"Missing parameter '{param_name}' for rule {id} (measure {measure_id})")
+                continue
+
+            compare_func = operators.get(comparator)    
+            
+            if compare_func is None:
+                logger.warning(f"Unknown comparator '{comparator}' in rule {id}")
+                continue
 
             if compare_func(current_value, threshold):
-                logger.info(f'Rule {id} BROKEN')
+                logger.debug(f'Rule {id} BROKEN')
                 broken_rules_id.append(id)
 
             else: 
-                logger.info(f'Rule {id} OK')
+                logger.debug(f'Rule {id} OK')
     
         if broken_rules_id:
-            logger.info(f'Broken rules for id {measure_id}: {broken_rules_id}')
+            logger.debug(f'Broken rules for id {measure_id}: {broken_rules_id}')
             return {
                 'measure_id':measure_id,
                 'broken_rules': broken_rules_id,
             }
         
         else:
-            logger.info(f'No broken rules for {measure_id}')
+            logger.debug(f'No broken rules for {measure_id}')
             return None
         
     except Exception as e:
@@ -107,46 +120,28 @@ async def send_events(broken_rules:Dict[str,Any],client: httpx.AsyncClient):
     try:
         #Envío al gateway interno para que registre los eventos en la DB
         response = await client.post(
-                    f"{GATEWAY_URL}/save_new_event/",
+                    f"{settings.gateway_url}{SAVE_NEW_EVENT_ENDPOINT}",
                     json=broken_rules
                 )
         
         response.raise_for_status()
-        logger.info(f"Sent events: Broken rules {broken_rules['broken_rules']} on measure {broken_rules['measure_id']}")
-        
+        logger.debug(f"Sent events: Broken rules {broken_rules['broken_rules']} on measure {broken_rules['measure_id']}")
+        return
     except httpx.HTTPError as e:
         logger.error(f"Error sending to gateway: {str(e)}")
-
-async def shutdown():
-    logger.info("Shutting down...ALM_EV uS")
-    # 1. Cancelar todas las tareas pendientes excepto la actual
-    pending = asyncio.all_tasks()
-    current_task = asyncio.current_task()
+        return
     
-    pending_tasks = [t for t in asyncio.all_tasks() if t is not asyncio.current_task()]
-    for task in pending_tasks:
-        task.cancel()
-    
-    try:
-        await asyncio.gather(*pending_tasks, return_exceptions=True)
-    except Exception as e:
-        logger.warning(f"Failed cancelling some tasks: {e}")
-
-
-    # 4. Cerrar cliente HTTP (si existe)
-    if 'http_client' in globals() and http_client:
-        await http_client.aclose()
-        logger.info("Cliente HTTP cerrado")
-    
-    logger.info("Shut down completed")
-
 async def main():
-    async with httpx.AsyncClient() as client:
+    logger.info('Initializing Measurement evaluator')
+    async with httpx.AsyncClient(timeout=settings.gateway_timeout) as client:
         while True:
             try:
                 measurement_id = await obtain_id() 
-                
-                if measurement_id:
+                if measurement_id is None:
+                    await asyncio.sleep(0.05)
+                    continue
+
+                if measurement_id is not None:
                     rules_per_id=await obtain_rules(measurement_id,client)
 
                     if rules_per_id:
