@@ -40,7 +40,7 @@ async def update_counters(notif_id:int,event_id:int,client:httpx.AsyncClient):
     try:
         logger.info(f"Updating Notification {notif_id} counter and trigger")
         response = await client.post(
-                    f"{GATEWAY_URL}/update_register/",
+                    f"{GATEWAY_URL}/update_incidents_counter/",
                     json=update_info
                 )
         
@@ -65,12 +65,15 @@ async def remind_event(notif_id:int,event_id:int,client:httpx.AsyncClient):
     try:
         logger.info(f"Updating Notification register {event_id} as the last succesfully notified")
         response = await client.post(
-                    f"{GATEWAY_URL}/reminder_update/",
+                    f"{GATEWAY_URL}/update_last_notif/",
                     json=update_notif
                 )
         
         response.raise_for_status()
+
+
         logger.info(f"Sent event {event_id} for registering the new event notification")
+        
         return response.status_code == 200        
 
     except httpx.HTTPError as e:

@@ -73,16 +73,16 @@ async def create_notif_reg(new_reg:Dict[str,Any]):
     except Exception as e:
         handle_service_errors(logger, e)
     
-@router.post("/update_register")
-async def update_counter(update_info:Dict[str,Any]): 
+@router.post("/update_incidents_counter")
+async def update_event_counter(update_info:Dict[str,Any]): 
     try:
         return await AlarmRegister.update_event_counter(update_info)
     except Exception as e:
         handle_service_errors(logger, e)
     
-@router.post("/reminder_update")
+@router.post("/update_last_notif")
 async def update_register(update_notif:Dict[str,Any]): 
     try:
-        return await AlarmRegister.update_notification_register(update_notif)
+        return await AlarmRegister.update_last_notification_register(update_notif)
     except Exception as e:
         handle_service_errors(logger, e)

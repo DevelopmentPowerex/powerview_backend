@@ -14,7 +14,7 @@ from typing import Dict, Any, Optional, List
 import logging
 logger = logging.getLogger(__name__)
 
-from ..protocols.pv_m3 import M3_MAPPING
+from uS_gateway.protocols.pv_m3 import M3_MAPPING
 
 class EventEvaluator:
     async def check_notification_register(event_id: int)->Optional[Dict[str,Any]]:   
@@ -24,19 +24,16 @@ class EventEvaluator:
             async with async_session() as session:
                 
                 subquery = select(AlarmEvent.rule_id).where(AlarmEvent.id == event_id).scalar_subquery()
-    
+
                 stmt_notifs = (
                     select(AlarmNotif)
-                    .join(AlarmEvent, AlarmNotif.rule_id== AlarmEvent.rule_id)
-                    .where(AlarmEvent.rule_id == subquery)
+                    .where(AlarmNotif.rule_id == subquery)
                     .order_by(desc(AlarmNotif.last_notif))  
                     .limit(1)
                 )
 
                 result_notifs = await session.execute(stmt_notifs) #Ejecución del statement
                 latest_notif = result_notifs.scalars().first() #Registro más reciente de las notificaciones encontradas
-
-                await session.commit()
                 
                 if not latest_notif:
                     return None
@@ -53,10 +50,10 @@ class EventEvaluator:
                 return  already_reg
                 
         except:
-            logger.exception('The event has not being notified')
+            logger.exception("Error checking notification register")
             return None
     
-    async def get_triggers_ts(current_event:int,last_trigger_id:int,last_notif_id:int)->Optional[Dict[str,Any]]:
+    async def get_triggers_ts(current_event:int,last_trigger_id:int,last_notif_id:int)->Optional[List[Dict[str,Any]]]:
         """Recibo el id de la ultima vez que ocurrió lo mismo y de la ultima vez que eso fue notificado, para extraer en formato de fecha y hora"""
         
         try:  
@@ -89,10 +86,8 @@ class EventEvaluator:
                 rows = {r.id: r for r in result_ts.mappings().all()}
 
                 # reconstruyes respetando duplicados
-                timestamp_results = [rows[i] for i in ids if i in rows]
+                timestamp_results = [dict(rows[i]) for i in ids if i in rows]
     
-                await session.commit()
-
                 if not timestamp_results:
                     return None
                 
@@ -180,6 +175,8 @@ class AlarmInformation:
 
     async def get_event_details(event_id: int) -> Optional[Dict[str,Any]]:
         try:
+            measure_details = None
+
             async with async_session() as session:
                 #Obtener las FK del evento, una para measure y otra para rule
                 event_fks=await AlarmInformation.get_FKs(session,event_id)
@@ -196,7 +193,11 @@ class AlarmInformation:
                 #Obtener TS,Meter,reading
                 if rule_details.get('parameter'):
 
-                    final_param=M3_MAPPING[rule_details['parameter']]
+                    final_param=M3_MAPPING.get(rule_details['parameter'])
+
+                    if not final_param:
+                        logger.error("No M3 mapping for parameter %s", rule_details["parameter"])
+                        return None
 
                     measure_details=await AlarmInformation.get_measure_details(
                         session,
@@ -239,8 +240,6 @@ class AlarmInformation:
                 result_nicknames=await session.execute(stmt_nicknames)
                 nicknames=result_nicknames.mappings().first()
                 
-                await session.commit()
-
                 if not nicknames:
                     return None
 
@@ -263,12 +262,10 @@ class AlarmInformation:
                 result = await session.execute(stmt_emails)
                 emails = result.scalars().all()
                 
-                await session.commit()
-
-                return emails if emails else None
+                return emails if emails else []
 
         except Exception as e:
-            logger.exception(f'Unexpected error getting the recipients emails for meter {meter_id}')
+            logger.exception(f'Unexpected error getting the recipients emails for meter {meter_id} {e}')
             return None
 
 
@@ -279,6 +276,9 @@ class AlarmRegister:
 
             event_fks=await AlarmInformation.get_FKs(session,new_notif['event_id'])   
 
+            if event_fks is None:
+                raise ValueError("Required Foreign Keys are missing")
+            
             new_notif_register=AlarmNotif(
                 rule_id=event_fks['rule_id'],
                 first_trigger=event_fks['measure_id'],
@@ -296,7 +296,7 @@ class AlarmRegister:
                 logger.error(f'Exception while saving on DB {e}')
                 return False
             
-    async def update_event_counter(update_info:Dict[str,Any])->bool:
+    async def update_event_counter(update_info:Dict[str,Any])->Optional[Dict[str,Any]]:
         async with async_session() as session:
             try:
                 stmt_current = (
@@ -333,9 +333,9 @@ class AlarmRegister:
 
             except Exception as e:
                 logger.error(f'Exception while updating event counter DB {e}')
-                return False
+                return None
         
-    async def update_notification_register(update_notification:Dict[str,Any]):
+    async def update_last_notification_register(update_notification:Dict[str,Any]):
         async with async_session() as session:
             try:
                 stmt_current = (
@@ -358,6 +358,7 @@ class AlarmRegister:
                     )
 
                 update_result=await session.execute(stmt_update_notif_reg)
+                
                 await session.commit()
                 
                 if not update_result:
