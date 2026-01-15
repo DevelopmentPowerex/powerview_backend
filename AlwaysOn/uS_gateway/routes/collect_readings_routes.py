@@ -3,6 +3,9 @@ from AlwaysOn.uS_gateway.schemas import EntireMeasure
 
 from fastapi import APIRouter, HTTPException
 
+import logging
+logger = logging.getLogger(__name__)
+
 router = APIRouter(
     prefix="/permanent/reading_collector",  # Todas las rutas aquí empezarán con /mqtt
     tags=["MQTT Readings Collector"]    # Etiqueta para la documentación automática (Swagger/Redoc)

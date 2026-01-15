@@ -4,11 +4,10 @@ from DB.models.devices import Meter
 from DB.database import async_session
 from AlwaysOn.uS_gateway.schemas import EntireMeasure
 
-
 from sqlalchemy import select
 
 import logging
-logger = logging.getLogger('GTW_collector')
+logger = logging.getLogger(__name__)
 
 class MQTTReadingCollector:
 

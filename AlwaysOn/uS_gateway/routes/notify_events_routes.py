@@ -9,6 +9,9 @@ router = APIRouter(
     tags=["NOTIFIER SYSTEM"]  
 )
 
+import logging
+logger = logging.getLogger(__name__)
+
 @router.get("/check_alarm_register")
 async def obtain_alarm_register(event_id:int = Query(..., gt=0)):
     notifs=await EventEvaluator.check_notification_register(event_id)

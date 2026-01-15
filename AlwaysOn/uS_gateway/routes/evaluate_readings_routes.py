@@ -5,6 +5,9 @@ from AlwaysOn.uS_gateway.schemas import EventModel
 from fastapi import APIRouter, Query
 from typing import Any
 
+import logging
+logger = logging.getLogger(__name__)
+
 router = APIRouter(
     prefix="/permanent/rule_evaluator", 
     tags=["Reading vs Rule Evaluator"]    

@@ -11,11 +11,18 @@ from .routes.notify_events_routes import router as notifier_router
 from OnDemand.gateway_connection.routes.extract_events_routes import router as extract_measure_router
 from OnDemand.gateway_connection.routes.extract_readings_routes import router as extract_event_router
 
+#Aqui van los protocolos
+
+from dotenv import load_dotenv
+load_dotenv(".env.local")
+
+from config import settings
+from shared.logging_config import setup_logging
+
+setup_logging(settings.log_level)
+
 import logging
-
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger('gtw_main')
-
+logger = logging.getLogger(__name__)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
