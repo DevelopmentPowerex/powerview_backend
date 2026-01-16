@@ -5,14 +5,14 @@ from typing import Dict, Any, Optional
 import asyncio
 import httpx
 
-from protocols.operators_list import operators
-from protocols.endpoints import SAVE_NEW_EVENT_ENDPOINT, GET_RULES_ENDPOINT
+from .protocols.operators_list import operators
+from .protocols.endpoints import SAVE_NEW_EVENT_ENDPOINT, GET_RULES_ENDPOINT
 
 from dotenv import load_dotenv
 load_dotenv(".env.local")
 
-from config import settings
-from shared.logging_config import setup_logging
+from .config import settings
+from .shared.logging_config import setup_logging
 
 setup_logging(settings.log_level)
 

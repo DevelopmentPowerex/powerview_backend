@@ -1,7 +1,6 @@
 #Microservicio para comunicación entre PowerView y el broker MQTT
 
 import asyncio
-import logging
 from typing import Dict, Any , Optional
 import json
 import httpx
@@ -13,14 +12,13 @@ import platform #Necesario para el funcionamiento del loop de windows
 if platform.system() == "Windows":
     asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
-from protocols.pvm3 import M3_MAPPING
+from .protocols.pvm3 import M3_MAPPING
 
 from dotenv import load_dotenv
 load_dotenv(".env.local")
 
 from config import settings
 from shared.logging_config import setup_logging
-
 setup_logging(settings.log_level)
 
 import logging
@@ -129,7 +127,7 @@ async def send_measure(measurement_data: Dict[str, Any],httpx_client:httpx.Async
         )
         measurement_response.raise_for_status()
         
-        logger.debug(f"Sent: Meter {measurement_data['serial_number']} Data from: {measurement_data['timestamp']}")
+        logger.info(f"Sent: Meter {measurement_data['serial_number']} Data from: {measurement_data['timestamp']}")
     
     except httpx.HTTPError as e:
         logger.error(f"Error sending to gateway: {str(e)}")
@@ -185,7 +183,7 @@ async def main():
                 timeout=settings.mqtt_timeout,
                 clean_session=True
             ) as mqtt_client:
-
+                
                 await mqtt_client.subscribe(settings.mqtt_topic)
                 logger.info(f"Subscribed to {settings.mqtt_topic}")
                 async with httpx.AsyncClient(timeout=settings.gateway_timeout) as httpx_client:
