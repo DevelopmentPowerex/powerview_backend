@@ -14,7 +14,7 @@ from typing import Dict, Any, Optional, List
 import logging
 logger = logging.getLogger(__name__)
 
-from uS_gateway.protocols.pv_m3 import M3_MAPPING
+from protocols.pvm3 import M3_MAPPING
 
 class EventEvaluator:
     async def check_notification_register(event_id: int)->Optional[Dict[str,Any]]:   
