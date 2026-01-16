@@ -14,5 +14,6 @@ class Settings:
     gateway_url: str = os.getenv("GATEWAY_URL", "http://127.0.0.1:8000/permanent/rule_evaluator")
     gateway_timeout:int=env_int("GATEWAY_TIMEOUT",30)
     rabbit_thread:str=os.getenv("RABBIT_THREAD","EV_RECV")
+    rabbit_url:str=os.getenv("RABBIT_URL","amqp://guest:guest@localhost/")
 
 settings = Settings()

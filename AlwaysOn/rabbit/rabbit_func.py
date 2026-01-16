@@ -3,7 +3,8 @@
 import json
 import aio_pika
 
-URL_RABBIT="amqp://guest:guest@localhost/"
+import logging
+logger = logging.getLogger(__name__)
 
 CONFIG = {
     'MQTT': {'queue': 'measure_pv', 'msg_key': 'new_measure_id'},
@@ -15,19 +16,20 @@ CONFIG = {
 
 ##uS MQTT envía id de medición guardada para triggerear a uS Alm_EV
 #requester: si lo envía uS MQTT o Alm_EV
-async def send_id(requester:str,desired_id: int):
+async def send_id(requester:str,desired_id: int,rabbit_url:str):
     
     conf = CONFIG.get(requester)
     
     if not conf:
-        print("Invalid requester")
-        return
+        logger.error("Invalid requester")
+        return None
     
-    connection = await aio_pika.connect_robust(URL_RABBIT)
+    connection = await aio_pika.connect_robust(rabbit_url)
 
     async with connection:
 
         channel = await connection.channel()
+
         queue = await channel.declare_queue(conf['queue'], durable=True)
 
         message = aio_pika.Message(
@@ -39,20 +41,21 @@ async def send_id(requester:str,desired_id: int):
         )
 
 ##uS Alm_EV debe estar pendiente de las nuevas escrituras en la misma queue
-async def read_id(requester:str):
+async def read_id(requester:str,rabbit_url:str):
     
     conf = CONFIG.get(requester)
 
     if not conf:
-        print("Invalid requester")
-        return
+        logger.error("Invalid requester")
+        return None
     
-    connection = await aio_pika.connect_robust(URL_RABBIT)
-    channel = await connection.channel()
-    queue = await channel.declare_queue(conf['queue'], durable=True)
+    connection = await aio_pika.connect_robust(rabbit_url)
+    async with connection:
+        channel = await connection.channel()
+        queue = await channel.declare_queue(conf['queue'], durable=True)
 
-    async with queue.iterator() as queue_iter:
-        async for message in queue_iter:
-            async with message.process():
-                data = json.loads(message.body.decode())
-                return (data,conf['msg_key'])
+        async with queue.iterator() as queue_iter:
+            async for message in queue_iter:
+                async with message.process():
+                    data = json.loads(message.body.decode())
+                    return (data,conf['msg_key'])

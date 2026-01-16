@@ -15,5 +15,6 @@ class Settings:
     gateway_timeout:int=env_int("GATEWAY_TIMEOUT",30)
     tasks_max: int = env_int("TASKS_MAX", 50)
     rabbit_thread=str = os.getenv("RABBIT_THREAD", "NOTIF")
+    rabbit_URL=os.getenv("RABBIT_URL","amqp://guest:guest@localhost/")
     
 settings = Settings() 

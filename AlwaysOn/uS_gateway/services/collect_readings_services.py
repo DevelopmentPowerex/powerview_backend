@@ -5,6 +5,7 @@ from DB.database import async_session
 from AlwaysOn.uS_gateway.schemas import EntireMeasure
 
 from sqlalchemy import select
+from ..config import settings
 
 import logging
 logger = logging.getLogger(__name__)
@@ -39,7 +40,7 @@ class MQTTReadingCollector:
                     await session.commit() #Final de microservicio 
                 
                     try: #Envío a Rabbit como trigger para el evaluador
-                        await send_id('MQTT',new_measurement.id)
+                        await send_id('MQTT',new_measurement.id, settings.rabbit_url)
                     except:
                         logger.error("Error comms queue")
                     return True

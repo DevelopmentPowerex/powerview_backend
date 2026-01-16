@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 async def obtain_id()-> Optional[int]:#Obtener id de le medición a evaluar
     #Leer el último id publicado en el queue para alarmas de rabbit
     try:
-        recent_measure_id=await read_id(settings.rabbit_thread) #Llamar a la función externa para obtener el id
+        recent_measure_id=await read_id(settings.rabbit_thread,settings.rabbit_url) #Llamar a la función externa para obtener el id
         just_id=recent_measure_id[0][recent_measure_id[1]]
         return just_id
     except Exception as e:
@@ -138,17 +138,17 @@ async def main():
             try:
                 measurement_id = await obtain_id() 
                 if measurement_id is None:
-                    await asyncio.sleep(0.05)
                     continue
 
-                if measurement_id is not None:
-                    rules_per_id=await obtain_rules(measurement_id,client)
+                rules_per_id=await obtain_rules(measurement_id,client)
 
-                    if rules_per_id:
-                        ev_results=await rule_evaluator(rules_per_id)
+                if not rules_per_id:
+                    continue
 
-                        if ev_results:
-                            await send_events(ev_results,client)
+                ev_results=await rule_evaluator(rules_per_id)
+
+                if ev_results:
+                    await send_events(ev_results,client)
                             
             except Exception as e:
                 logger.error(f'Unexpected error in main process: {e}')

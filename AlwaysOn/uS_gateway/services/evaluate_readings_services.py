@@ -6,7 +6,6 @@ from AlwaysOn.rabbit.rabbit_func import send_id
 
 from typing import Any, Optional, List
 
-import logging
 from sqlalchemy.future import select
 from sqlalchemy import Float, and_, func
 
@@ -72,7 +71,7 @@ class ReadingEvaluator:
     async def send_event_MQ(event_list:List[Any])->bool:
         try:    
             for event in event_list:                        
-                await send_id(settings.rabbit_thread,event.id)
+                await send_id(settings.rabbit_thread,event.id,settings.rabbit_url)
             return True
         except:
             return False
