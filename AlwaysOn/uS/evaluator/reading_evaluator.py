@@ -9,7 +9,7 @@ from .protocols.operators_list import operators
 from .protocols.endpoints import SAVE_NEW_EVENT_ENDPOINT, GET_RULES_ENDPOINT
 
 from dotenv import load_dotenv
-load_dotenv(".env.local")
+load_dotenv("./AlwaysOn/uS/evaluator/.env.local")
 
 from .config import settings
 from .shared.logging_config import setup_logging
@@ -125,7 +125,7 @@ async def send_events(broken_rules:Dict[str,Any],client: httpx.AsyncClient):
                 )
         
         response.raise_for_status()
-        logger.debug(f"Sent events: Broken rules {broken_rules['broken_rules']} on measure {broken_rules['measure_id']}")
+        logger.info(f"Sent events: Broken rules {broken_rules['broken_rules']} on measure {broken_rules['measure_id']}")
         return
     except httpx.HTTPError as e:
         logger.error(f"Error sending to gateway: {str(e)}")

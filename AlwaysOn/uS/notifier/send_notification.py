@@ -6,15 +6,8 @@ import httpx
 from AlwaysOn.uS.notifier.fetch_notification_details import get_notification_data
 from AlwaysOn.uS.notifier.email.send_email import notify_by_email
 
-from dotenv import load_dotenv
-load_dotenv(".env.local")
-
-from config import settings
-from shared.logging_config import setup_logging
-
-setup_logging(settings.log_level)
-
 import logging
+
 logger = logging.getLogger(__name__)
 
 async def notify_method(final_notif_data:Dict[str,Any],counter_notif:int)->Optional[bool]:

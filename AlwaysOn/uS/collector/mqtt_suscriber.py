@@ -15,10 +15,12 @@ if platform.system() == "Windows":
 from .protocols.pvm3 import M3_MAPPING
 
 from dotenv import load_dotenv
-load_dotenv(".env.local")
 
-from config import settings
-from shared.logging_config import setup_logging
+load_dotenv("./AlwaysOn/uS/collector/.env.local")
+
+from .config import settings
+from .shared.logging_config import setup_logging
+
 setup_logging(settings.log_level)
 
 import logging
@@ -175,6 +177,7 @@ async def shutdown():
 
 async def main():
     while True:
+        
         try:
             async with Client(
                 hostname=settings.mqtt_broker, 

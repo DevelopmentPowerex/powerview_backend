@@ -7,6 +7,7 @@ from typing import Any,Dict
 from ..shared.routes_exceptions import handle_service_errors
 
 
+
 router = APIRouter(
     prefix="/permanent/alarm_processing",  
     tags=["NOTIFIER SYSTEM"]  

@@ -4,18 +4,14 @@ from email.mime.text import MIMEText
 from email.mime.application import MIMEApplication
 from email.mime.image import MIMEImage
 
-import logging
 from typing import Optional, Dict, Any
 
 from AlwaysOn.uS.notifier.email.email_body import email_builder
 
-SMTP_SERVER = "mail.premium-energia.com"
-SMTP_PORT = 465
-SENDER_USERNAME = "monitoreo@premium-energia.com" 
-SENDER_PASSWORD = "m0n1t0r30."
+import logging
+from ..config import settings
 
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger('send_email') 
+logger = logging.getLogger(__name__)
 
 async def send_email(email_data:Dict[str,Any],alarm_html:str):
     
@@ -41,13 +37,12 @@ async def send_email(email_data:Dict[str,Any],alarm_html:str):
 
     msg=MIMEMultipart('related')
     msg['Subject'] = f"⚠POWERVIEW: {project_name} | {meter_nickname} "
-    msg['From'] = SENDER_USERNAME
+    msg['From'] = settings.smtp_user
 
     # Aquí va la LISTA de destinatarios, unida en texto
     msg['To'] = ", ".join(recipients)
 
-    #msg['To'] = receiver_username
-    msg['Bcc'] = SENDER_USERNAME
+    msg['Bcc'] = settings.smtp_user
 
     msg_alternative = MIMEMultipart('alternative')
     msg.attach(msg_alternative)
@@ -63,8 +58,8 @@ async def send_email(email_data:Dict[str,Any],alarm_html:str):
             msg.attach(img)
 
     try:
-        with smtplib.SMTP_SSL(SMTP_SERVER, SMTP_PORT) as server:
-            server.login(SENDER_USERNAME, SENDER_PASSWORD) 
+        with smtplib.SMTP_SSL(settings.smtp_server, settings.smtp_port) as server:
+            server.login(settings.smtp_user, settings.smtp_password) 
             server.send_message(msg)
         logger.info("Email sent")
         return True

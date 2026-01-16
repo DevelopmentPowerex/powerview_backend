@@ -8,6 +8,7 @@ def env_int(name: str, default: int) -> int:
 
 @dataclass(frozen=True)
 class Settings:
+    
     env: str = os.getenv("ENV", "local")
     log_level: str = os.getenv("LOG_LEVEL", "INFO").upper()
 

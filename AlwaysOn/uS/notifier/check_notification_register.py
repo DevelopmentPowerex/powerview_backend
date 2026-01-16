@@ -1,15 +1,11 @@
 import httpx
 from typing import Optional, Dict, Any
 
-from dotenv import load_dotenv
-load_dotenv(".env.local")
-
-from config import settings
-from shared.logging_config import setup_logging
-
-setup_logging(settings.log_level)
-
 import logging
+from .config import settings
+
+from .protocols.endpoints import CHECK_NOTIFICATION_REGISTER
+
 logger = logging.getLogger(__name__)
 
 async def check_register(event_id:int,client:httpx.AsyncClient)-> Optional[tuple[str,int]]: 
@@ -19,7 +15,7 @@ async def check_register(event_id:int,client:httpx.AsyncClient)-> Optional[tuple
     try:
              
         notification_register = await client.get(
-            f"{settings.gateway_url}/check_alarms_register/",
+            f"{settings.gateway_url}{CHECK_NOTIFICATION_REGISTER}",
             params={"event_id": event_id}
         )
 

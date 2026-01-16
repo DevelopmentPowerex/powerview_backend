@@ -12,10 +12,10 @@ from AlwaysOn.uS.notifier.send_notification import send_notification
 from AlwaysOn.uS.notifier.update_register import new_reg_notification, remind_event,update_counters
 
 from dotenv import load_dotenv
-load_dotenv(".env.local")
+load_dotenv("./AlwaysOn/uS/notifier/.env.local")
 
-from config import settings
-from shared.logging_config import setup_logging
+from .config import settings
+from .shared.logging_config import setup_logging
 
 setup_logging(settings.log_level)
 
@@ -25,7 +25,7 @@ logger = logging.getLogger(__name__)
 async def obtain_event_id()-> Optional[int]:#Obtener id de le medición a evaluar
     #Leer el último id publicado en el queue para alarmas de rabbit
     try:
-        recent_event_id=await read_id(settings.rabbit_thread) #Llamar a la función externa para obtener el id
+        recent_event_id=await read_id(settings.rabbit_thread,settings.rabbit_URL) #Llamar a la función externa para obtener el id
         just_id=recent_event_id[0][recent_event_id[1]]
         logger.debug(f"New alarm event: {just_id}")
         return just_id

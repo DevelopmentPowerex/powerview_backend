@@ -3,21 +3,16 @@ from typing import Optional, Dict, Any,List
 
 from datetime import datetime
 
-from dotenv import load_dotenv
-load_dotenv(".env.local")
-
-from config import settings
-from shared.logging_config import setup_logging
-
-setup_logging(settings.log_level)
-
 import logging
+from .config import settings
+from .protocols.endpoints import GET_EVENT_TIMESTAMPS
+
 logger = logging.getLogger(__name__)
 
 async def fetch_events_timestamps(event_id:int,notif_reg_data:Dict[str,Any],client:httpx.AsyncClient)->Optional[List[Dict[str,Any]]]:
     try:
         notification_triggers_ts = await client.get(
-                f"{settings.gateway_url}/fetch_events_ts/",
+                f"{settings.gateway_url}{GET_EVENT_TIMESTAMPS}",
                 params={"current_event_id":event_id,"last_trigger_id":notif_reg_data['lt'], "last_notif_id":notif_reg_data['ln']}
         )
  
