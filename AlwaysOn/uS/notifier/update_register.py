@@ -2,7 +2,10 @@ from typing import Optional, Any, Dict
 import httpx
 
 import logging
+
 from .config import settings
+
+from .protocols.endpoints import NEW_NOTIFICATION_REG , UPDATE_INCIDENTS , UPDATE_LAST_NOTIFICATION
 
 logger = logging.getLogger(__name__)
 
@@ -15,7 +18,7 @@ async def new_reg_notification(event_id:int,event_counter:int,client:httpx.Async
 
     try:
         register_notification_sent = await client.post(
-                    f"{settings.gateway_url}/register_notification",
+                    f"{settings.gateway_url}{NEW_NOTIFICATION_REG}",
                     json=new_register
                 )
         
@@ -39,7 +42,7 @@ async def update_counters(notif_id:int,event_id:int,client:httpx.AsyncClient):
     try:
         logger.debug(f"Updating Notification {notif_id} counter and trigger")
         response = await client.post(
-                    f"{settings.gateway_url}/update_incidents_counter",
+                    f"{settings.gateway_url}{UPDATE_INCIDENTS}",
                     json=update_info
                 )
         
@@ -64,7 +67,7 @@ async def remind_event(notif_id:int,event_id:int,client:httpx.AsyncClient):
     try:
         logger.debug(f"Updating Notification register {event_id} as the last succesfully notified")
         response = await client.post(
-                    f"{settings.gateway_url}/update_last_notif",
+                    f"{settings.gateway_url}{UPDATE_LAST_NOTIFICATION}",
                     json=update_notif
                 )
         

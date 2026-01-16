@@ -23,7 +23,7 @@ async def check_register(event_id:int,client:httpx.AsyncClient)-> Optional[tuple
         response_notification_register=notification_register.json()
         
         if not notification_register: 
-            logger.info(f'This event has not been notified before')
+            logger.debug(f'This event has not been notified before')
             return None
                 
         return response_notification_register

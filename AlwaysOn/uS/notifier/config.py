@@ -9,7 +9,7 @@ def env_int(name: str, default: int) -> int:
 @dataclass(frozen=True)
 class Settings:
     env: str = os.getenv("ENV", "local")
-    log_level: str = os.getenv("LOG_LEVEL", "DEBUG").upper()
+    log_level: str = os.getenv("LOG_LEVEL", "INFO").upper()
 
     gateway_url: str = os.getenv("GATEWAY_URL", "http://127.0.0.1:8000/permanent/alarm_processing")
     gateway_timeout:int=env_int("GATEWAY_TIMEOUT",30)

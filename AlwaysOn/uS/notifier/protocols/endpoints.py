@@ -9,3 +9,8 @@ GET_RECIPIENTS_EMAIL="/fetch_recipient_email"
 GET_RECIPIENTS_NUMBER="/fetch_recipient_number"
 
 CHECK_NOTIFICATION_REGISTER="/check_alarm_register"
+
+NEW_NOTIFICATION_REG="/register_notification"
+UPDATE_INCIDENTS="/update_incidents_counter"
+UPDATE_LAST_NOTIFICATION="/update_last_notif"
+

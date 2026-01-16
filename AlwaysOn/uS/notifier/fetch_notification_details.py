@@ -72,8 +72,8 @@ async def get_receiver_data(meter_id:int,client:httpx.AsyncClient)-> Optional[Di
         return None
 
     return{
-        'project_nickname': nicknames_data['project_nickname'],
-        'meter_nickname':nicknames_data['meter_nickname'],
+        'project_nickname': nicknames_data.get('project_nickname'),
+        'meter_nickname':nicknames_data.get('meter_nickname'),
     }
 
 async def get_notification_data(event_id:int,client:httpx.AsyncClient)-> Optional[Dict[str,Any]]:
@@ -94,8 +94,8 @@ async def get_notification_data(event_id:int,client:httpx.AsyncClient)-> Optiona
         return None
         
     receiver_data={
-        'project_name':project_data['project_nickname'],
-        'meter_nickname':project_data['meter_nickname'],
+        'project_name':project_data.get('project_nickname'),
+        'meter_nickname':project_data.get('meter_nickname'),
         'channel':notif_channel,
         'recipients_list':notification_recipients
     }
