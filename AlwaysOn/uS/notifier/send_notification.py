@@ -28,7 +28,7 @@ async def notify_method(final_notif_data:Dict[str,Any],counter_notif:int)->Optio
         return notif_result
     
     except:
-        logger.exception('Something went wrong while reading the notification channel')
+        logger.exception('Error reading the notification channel')
         return None
 
 async def send_notification(event_id:int,client:httpx.AsyncClient,counter_notif:int)->Optional[bool]:

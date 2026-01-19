@@ -1,5 +1,5 @@
 from email.mime.image import MIMEImage
-from typing import Dict,Any
+from typing import Dict,Any, Optional
 
 from ..protocols.pvm3 import M3_MAPPING, PARAMETER_TRANSLATION
 
@@ -8,15 +8,18 @@ from ..config import settings
 
 logger = logging.getLogger(__name__)
 
-async def attach_image_to_email(email_message, filename, content_id)->MIMEImage:
+async def attach_image_to_email(filename, content_id)->Optional[MIMEImage]:
+    try:
+        with open(filename, "rb") as f:
+            img = MIMEImage(f.read())
+            img.add_header('Content-ID', f'<{content_id}>')
+            img.add_header('Content-Disposition', 'inline', filename=filename)
 
-    with open(filename, "rb") as f:
-        img = MIMEImage(f.read())
-        img.add_header('Content-ID', f'<{content_id}>')
-        img.add_header('Content-Disposition', 'inline', filename=filename)
-
-    return img
-
+        return img
+    except Exception as e:
+        logger.error(f'Error attaching iamge {filename} to the message ')
+        return None
+    
 async def email_builder(email_data:Dict[str,Any],counter_notif:int)->str:
     try:
         case_inf=email_data['event_data']
@@ -139,7 +142,7 @@ async def email_builder(email_data:Dict[str,Any],counter_notif:int)->str:
         return alarm_html
     
     except Exception as e:
-        logger.error(f'Something went wrong while building the html:{e}')
+        logger.error(f'Error building the email html:{e}')
         return None
     
 

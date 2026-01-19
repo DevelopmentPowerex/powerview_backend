@@ -42,7 +42,7 @@ async def process_event(new_event_id:int,client:httpx.AsyncClient):
         logger.debug(f'Broken rule:{registered_notification["rule"]}. First event:{registered_notification["ft"]} Last event:{registered_notification["lt"]} #:{registered_notification["counter"]} Last Alarm:{registered_notification["ln"]}')      
         
         notify_decision= await evaluate_register(new_event_id,registered_notification,client) #Decidir si lo ocurrido debe notificarse o no 
-        logger.debug(f' Event has to be {notify_decision}')
+        logger.debug(f'Action: {notify_decision}')
         
         if (notify_decision != "Create") and (notify_decision is not None):
             
@@ -56,7 +56,6 @@ async def process_event(new_event_id:int,client:httpx.AsyncClient):
               
     if (not registered_notification) or (notify_decision=='Create'):
         return True,1,None
-
 
 async def main():
     async with httpx.AsyncClient() as client:
@@ -77,8 +76,8 @@ async def main():
                                 else:
                                     event_proccessed= await new_reg_notification(new_event_id,notification_counter,client)   
 
-                                
-                        logger.debug(f'Event {new_event_id} processed succesfully')
+                                if event_proccessed:
+                                    logger.debug(f'Event {new_event_id} processed succesfully')
 
                 except Exception as e:
                     logger.error(f'Unexpected error in main process: {e}')

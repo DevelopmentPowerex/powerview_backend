@@ -13,20 +13,19 @@ async def check_register(event_id:int,client:httpx.AsyncClient)-> Optional[tuple
     #Siempre que retorne None, significa que hay que realizar un registro nuevo, ya sea porque no se ha notificado o porque debe tomarse el evento como uno nuevo
 
     try:
-             
         notification_register = await client.get(
             f"{settings.gateway_url}{CHECK_NOTIFICATION_REGISTER}",
             params={"event_id": event_id}
         )
 
         notification_register.raise_for_status()
-        response_notification_register=notification_register.json()
+        content_notification_register=notification_register.json()
         
-        if not notification_register: 
+        if not content_notification_register: 
             logger.debug(f'This event has not been notified before')
             return None
                 
-        return response_notification_register
+        return content_notification_register
         
     except httpx.HTTPError as e:
         logger.error(f'Error asking to internal gateway {str(e)}')

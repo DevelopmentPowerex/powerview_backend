@@ -61,7 +61,7 @@ async def send_email(email_data:Dict[str,Any],alarm_html:str):
         with smtplib.SMTP_SSL(settings.smtp_server, settings.smtp_port) as server:
             server.login(settings.smtp_user, settings.smtp_password) 
             server.send_message(msg)
-        logger.info("Email sent")
+        logger.info(f"Email sent to {msg['To']}")
         return True
     
     except Exception as e:
@@ -77,7 +77,4 @@ async def notify_by_email(email_data:Dict[str,Any],counter_notif:int)->bool:
     
     sent_email=await send_email(email_data,email_html)
     
-    if not sent_email:
-        return None
-    
-    return True
+    return sent_email if sent_email else None
