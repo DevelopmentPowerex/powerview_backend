@@ -1,11 +1,13 @@
 from AlwaysOn.uS_gateway.services.notify_events_services import EventEvaluator, AlarmInformation, AlarmRegister
 
-from fastapi import APIRouter, HTTPException,Query
+from fastapi import APIRouter, HTTPException,Query, Depends
 
 from typing import Any,Dict
 
 from ..shared.routes_exceptions import handle_service_errors
 
+from sqlalchemy.ext.asyncio import AsyncSession
+from DB.database import get_db
 
 
 router = APIRouter(
@@ -17,9 +19,10 @@ import logging
 logger = logging.getLogger(__name__)
 
 @router.get("/check_alarm_register")
-async def obtain_alarm_register(event_id:int = Query(..., gt=0)):
+async def obtain_alarm_register(session: AsyncSession= Depends(get_db),
+                                event_id:int = Query(..., gt=0)):
     try:
-        notifs=await EventEvaluator.check_notification_register(event_id)
+        notifs=await EventEvaluator.check_notification_register(session,event_id)
         return notifs 
     except Exception as e:
         handle_service_errors(logger, e)    

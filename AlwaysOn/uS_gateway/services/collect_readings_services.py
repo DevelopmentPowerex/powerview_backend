@@ -3,6 +3,7 @@ from DB.models.measurements import Measurement
 from DB.models.devices import Meter
 from DB.database import async_session
 from AlwaysOn.uS_gateway.schemas import EntireMeasure
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from sqlalchemy import select
 from ..config import settings
@@ -13,9 +14,9 @@ logger = logging.getLogger(__name__)
 class MQTTReadingCollector:
 
     @staticmethod
-    async def save_reading(lecture: EntireMeasure) -> bool: 
+    async def save_reading(session:AsyncSession,lecture: EntireMeasure) -> bool: 
         try:
-            async with async_session() as session:
+            
                 try:
                      # 1. Obtener ID del medidor
                     idReadMeter = await session.scalar(
