@@ -14,7 +14,7 @@ from OnDemand.gateway_connection.routes.extract_readings_routes import router as
 #Aqui van los protocolos
 
 from dotenv import load_dotenv
-load_dotenv(".env.local")
+load_dotenv("./AlwaysOn/uS_gateway/.env.local")
 
 from .config import settings
 from .shared.logging_config import setup_logging

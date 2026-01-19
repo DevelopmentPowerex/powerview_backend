@@ -19,10 +19,6 @@ class AlarmLevel(int,Enum):
     MID = 2
     CRITICAL = 3
 
-class AlarmState(str,Enum):
-    ACTIVE = "active"
-    UNACTIVE = "unactive"
-    
 class AlarmChannels(int,Enum):
     EMAIL = 1
     SMS = 2

@@ -2,14 +2,15 @@ from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sess
 from .core import Base
 
 # Configuración para PostgreSQL
-DATABASE_URL = "postgresql+asyncpg://jera:105181@localhost:5432/powerview"
+
+from AlwaysOn.uS_gateway.config import settings
 
 engine = create_async_engine(
-    DATABASE_URL,
+    settings.db_url,
     pool_pre_ping=True,
-    echo=True,
-    pool_size=10,  # Número de conexiones en el pool
-    max_overflow=5,  # Conexiones adicionales cuando el pool está lleno
+    echo=settings.db_echo,
+    pool_size=settings.db_pool_size,  # Número de conexiones en el pool
+    max_overflow=settings.db_max_overflow,  # Conexiones adicionales cuando el pool está lleno
     connect_args={
        "server_settings": {
             "application_name": "PowerView",

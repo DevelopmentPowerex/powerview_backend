@@ -58,6 +58,7 @@ async def process_event(new_event_id:int,client:httpx.AsyncClient):
         return True,1,None
 
 async def main():
+    logger.info('Initializing Notification service')
     async with httpx.AsyncClient() as client:
             while True:
                 try:

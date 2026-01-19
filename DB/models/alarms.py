@@ -1,5 +1,5 @@
 from sqlalchemy import (
-    Column, Integer, String, ForeignKey, Double,DateTime,Boolean, Enum as SQLEnum)
+    Column, Integer, String, ForeignKey, Double, Enum as SQLEnum)
 
 from sqlalchemy.orm import relationship
 

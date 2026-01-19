@@ -26,9 +26,9 @@ class DeviceModel(Base):
 class ParametersPVM3(Base):
     __tablename__='parameters_pvm3'
     id= Column(Integer, primary_key=True)
-    param_code = Column(String(20), unique=True, nullable=False)  # ejemplo: 'vA'
-    description = Column(String(100), nullable=False)       # ejemplo: 'Voltaje entre Fase A y Neutro'
-    unit = Column(String(10), nullable=False)               # ejemplo: 'V'
+    param_code = Column(String(20), unique=True, nullable=False) 
+    description = Column(String(100), nullable=False) 
+    unit = Column(String(10), nullable=False)               
     
     def __repr__(self):
         return f'<{self.param_code} - {self.description}>'
