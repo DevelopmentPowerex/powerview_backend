@@ -32,7 +32,7 @@ async def obtain_id()-> Optional[int]:#Obtener id de le medición a evaluar
 async def obtain_rules(received_id:int,client: httpx.AsyncClient)->Optional[dict[str,Any]]: #Con id obtenido, traemos las reglas
 
     try:
-        logger.debug(f'Extract rules for reading id {received_id}')      
+        logger.debug(f'Evaluate reading id: {received_id}')      
         
         response = await client.get(
             f"{settings.gateway_url}{GET_RULES_ENDPOINT}",
@@ -43,19 +43,19 @@ async def obtain_rules(received_id:int,client: httpx.AsyncClient)->Optional[dict
         response_data=response.json()
 
         if not response_data:
-            logger.debug(f'No rules returned for Measure id: {received_id}')    
+            logger.debug(f'No rules for: {received_id}')    
             return None
 
         rules=response_data.get('rules',None)
         if not rules:
-            logger.warning(f'Measure id: {received_id} returned no rules')      
+            logger.warning(f'Reading {received_id} returned no rules')      
             return None
         
         parameters=response_data.get('param_values',None)
         if not parameters:
-            logger.warning(f'Measure id: {received_id} returned no parameters')     
+            logger.warning(f'Reading {received_id} returned no parameters')     
         
-        logger.debug(f'Measure id: {received_id} returned {len(rules)} rules')      
+        logger.debug(f'Reading {received_id} has to be evaluated under {len(rules)} rules')      
 
         return {
             'measure_id':received_id,
@@ -103,6 +103,7 @@ async def rule_evaluator(data_for_ev:dict[str,Any])->Optional[Dict[str,Any]]: #L
     
         if broken_rules_id:
             logger.debug(f'Broken rules for id {measure_id}: {broken_rules_id}')
+            
             return {
                 'measure_id':measure_id,
                 'broken_rules': broken_rules_id,
@@ -125,7 +126,8 @@ async def send_events(broken_rules:Dict[str,Any],client: httpx.AsyncClient):
                 )
         
         response.raise_for_status()
-        logger.info(f"Sent events: Broken rules {broken_rules['broken_rules']} on measure {broken_rules['measure_id']}")
+        event=response.json()
+        logger.info(f"measurement: {broken_rules['measure_id']} | broken: {broken_rules['broken_rules']} | reg: {event[0]['id']}")
         return
     except httpx.HTTPError as e:
         logger.error(f"Error sending to gateway: {str(e)}")

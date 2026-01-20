@@ -128,8 +128,9 @@ async def send_measure(measurement_data: Dict[str, Any],httpx_client:httpx.Async
             json=measurement_data
         )
         measurement_response.raise_for_status()
-        
-        logger.info(f"Sent: Meter {measurement_data['serial_number']} Data from: {measurement_data['timestamp']}")
+        measurement_id=measurement_response.json()
+
+        logger.info(f"sn: {measurement_data['serial_number']} | tp: {measurement_data['timestamp']} | reg: {measurement_id}")
     
     except httpx.HTTPError as e:
         logger.error(f"Error sending to gateway: {str(e)}")

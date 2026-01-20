@@ -88,7 +88,7 @@ class ReadingEvaluator:
             return False
     
     @staticmethod
-    async def save_broken_rules(events_info: Dict[str,Any],session:AsyncSession) -> bool:
+    async def save_broken_rules(events_info: Dict[str,Any],session:AsyncSession) -> Optional[List[int]]:
         try:
             measure_events_id=events_info['measure_id']
             broken_rules=events_info['broken_rules']
@@ -109,7 +109,7 @@ class ReadingEvaluator:
         except Exception:
             logger.exception("Error saving alarm events")
             await session.rollback()
-            return False
+            return []
         
         try:
             MQ_sent=await ReadingEvaluator.send_event_MQ(events_to_notif)
@@ -119,4 +119,4 @@ class ReadingEvaluator:
         except Exception:
             logger.exception("Error comms queue") 
         
-        return True
+        return events_to_notif
