@@ -24,7 +24,7 @@ async def new_reg_notification(event_id:int,event_counter:int,client:httpx.Async
         
         register_notification_sent.raise_for_status()
 
-        logger.debug(f"{event_id} new event notification registered")
+        logger.debug(f"{event_id} new notification registered")
         return True
         
     except httpx.HTTPError as e:
@@ -81,7 +81,7 @@ async def remind_event(notif_id:int,event_id:int,client:httpx.AsyncClient)->bool
         
         response.raise_for_status()
 
-        logger.debug(f"Sent event {event_id} for registering the new event notification")
+        logger.debug(f"Updated{event_id} new sent notification")
         return True
     
     except httpx.HTTPError as e:

@@ -28,7 +28,7 @@ async def obtain_event_id()-> Optional[int]:#Obtener id de le medición a evalua
     try:
         recent_event_id=await read_id(settings.rabbit_thread,settings.rabbit_URL) #Llamar a la función externa para obtener el id
         just_id=recent_event_id[0][recent_event_id[1]]
-        logger.debug(f"New alarm event: {just_id}")
+        logger.debug(f"Event to process: {just_id}")
         return just_id
     except Exception as e:
         logger.error(f'Error reading the id for the latest event {e}')
@@ -40,15 +40,14 @@ async def process_event(new_event_id:int,client:httpx.AsyncClient):
                   
     if registered_notification: 
 
-        logger.debug(f'Broken rule:{registered_notification["rule"]}. First event:{registered_notification["ft"]} Last event:{registered_notification["lt"]} #:{registered_notification["counter"]} Last Alarm:{registered_notification["ln"]}')      
+        logger.debug(f'Rule:{registered_notification["rule"]}. First event:{registered_notification["ft"]} Last event:{registered_notification["lt"]} #:{registered_notification["counter"]} Last Alarm:{registered_notification["ln"]}')      
         
         notify_decision= await evaluate_register(new_event_id,registered_notification,client) #Decidir si lo ocurrido debe notificarse o no 
         logger.debug(f'Action: {notify_decision}')
         
         if (notify_decision != "Create") and (notify_decision is not None):
-            
+            logger.info(f"event: {new_event_id} | action: {notify_decision} | reg: {registered_notification['id']}")
             new_counter= await update_counters(registered_notification['id'],new_event_id,client)
-            
             if notify_decision=='Update': #Actualizar los contadores y no notificar
                 return False,new_counter,registered_notification['id']
             
@@ -56,6 +55,7 @@ async def process_event(new_event_id:int,client:httpx.AsyncClient):
                 return True,new_counter,registered_notification['id']
               
     if (not registered_notification) or (notify_decision=='Create'):
+        logger.info(f"event: {new_event_id} | action: {notify_decision} |")
         return True,1,None
 
 async def main():
@@ -68,7 +68,7 @@ async def main():
                     if new_event_id:
                         
                         sender_trigger,notification_counter,previous_register_id=await process_event(new_event_id,client) 
-                           
+                        
                         if sender_trigger:
                             sent_notification=await send_notification(new_event_id,client,notification_counter)
                             
@@ -77,7 +77,7 @@ async def main():
                                     event_proccessed= await remind_event(previous_register_id,new_event_id,client)   
                                 else:
                                     event_proccessed= await new_reg_notification(new_event_id,notification_counter,client)   
-
+                        
                                 if event_proccessed:
                                     logger.debug(f'Event {new_event_id} processed succesfully')
 
