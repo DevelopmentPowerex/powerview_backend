@@ -32,11 +32,11 @@ async def obtain_id()-> Optional[int]:#Obtener id de le medición a evaluar
 async def obtain_rules(received_id:int,client: httpx.AsyncClient)->Optional[dict[str,Any]]: #Con id obtenido, traemos las reglas
 
     try:
-        logger.debug(f'Sent id {received_id} for extracting the rules')      
+        logger.debug(f'Extract rules for reading id {received_id}')      
         
         response = await client.get(
             f"{settings.gateway_url}{GET_RULES_ENDPOINT}",
-            params={"request": received_id}
+            params={"measure_id": received_id}
         )
 
         response.raise_for_status()
@@ -52,7 +52,7 @@ async def obtain_rules(received_id:int,client: httpx.AsyncClient)->Optional[dict
             return None
         
         parameters=response_data.get('param_values',None)
-        if not rules:
+        if not parameters:
             logger.warning(f'Measure id: {received_id} returned no parameters')     
         
         logger.debug(f'Measure id: {received_id} returned {len(rules)} rules')      
@@ -74,7 +74,7 @@ async def rule_evaluator(data_for_ev:dict[str,Any])->Optional[Dict[str,Any]]: #L
     parameters=data_for_ev['parameters'] #Contiene los valores leidos de la medición
     
     broken_rules_id=[]
-
+    #logger.debug(rules)
     try: 
         for rule in rules:
             
@@ -149,7 +149,7 @@ async def main():
 
                 if ev_results:
                     await send_events(ev_results,client)
-                            
+                                
             except Exception as e:
                 logger.error(f'Unexpected error in main process: {e}')
 

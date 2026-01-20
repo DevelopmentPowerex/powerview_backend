@@ -16,3 +16,5 @@ def setup_logging(level: str = "INFO") -> None:
     # opcional: reduce ruido de libs
     logging.getLogger("httpx").setLevel(logging.WARNING)
     logging.getLogger("httpcore").setLevel(logging.WARNING)
+    logging.getLogger("aiormq").setLevel(logging.WARNING)
+    logging.getLogger("aio_pika").setLevel(logging.WARNING)

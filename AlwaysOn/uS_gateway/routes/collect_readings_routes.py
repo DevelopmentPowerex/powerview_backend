@@ -1,7 +1,9 @@
 from AlwaysOn.uS_gateway.services.collect_readings_services import MQTTReadingCollector  # Importamos la clase
 from AlwaysOn.uS_gateway.schemas import EntireMeasure
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException,Depends
+from sqlalchemy.ext.asyncio import AsyncSession
+from DB.database import get_db
 
 import logging
 logger = logging.getLogger(__name__)
@@ -12,10 +14,11 @@ router = APIRouter(
 )
     
 @router.post("/save_new_reading")
-async def receive_lecture(lecture:EntireMeasure): #Recibo la lectura procesada de parte del microservicio
+async def receive_lecture(lecture:EntireMeasure,
+                          session: AsyncSession = Depends(get_db)): #Recibo la lectura procesada de parte del microservicio
     try:
-        result = await MQTTReadingCollector.save_reading(lecture)
-        return result  
+        result = await MQTTReadingCollector.save_reading(lecture,session)
+        return result 
     except ValueError as e:
         raise HTTPException(400, detail=str(e))
     except Exception:

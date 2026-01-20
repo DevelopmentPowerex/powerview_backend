@@ -3,6 +3,9 @@ import logging
 from typing import Dict, Any, Optional
 import httpx
 
+from dotenv import load_dotenv
+load_dotenv("./AlwaysOn/uS/notifier/.env.local")
+
 from AlwaysOn.rabbit.rabbit_func import read_id
 from AlwaysOn.uS.notifier.check_notification_register import check_register
 from AlwaysOn.uS.notifier.choose_notification_action import evaluate_register
@@ -11,8 +14,6 @@ from AlwaysOn.uS.notifier.update_register import update_counters
 from AlwaysOn.uS.notifier.send_notification import send_notification
 from AlwaysOn.uS.notifier.update_register import new_reg_notification, remind_event,update_counters
 
-from dotenv import load_dotenv
-load_dotenv("./AlwaysOn/uS/notifier/.env.local")
 
 from .config import settings
 from .shared.logging_config import setup_logging

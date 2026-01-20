@@ -1,7 +1,6 @@
 from AlwaysOn.rabbit.rabbit_func import send_id
 from DB.models.measurements import Measurement
 from DB.models.devices import Meter
-from DB.database import async_session
 from AlwaysOn.uS_gateway.schemas import EntireMeasure
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -14,47 +13,37 @@ logger = logging.getLogger(__name__)
 class MQTTReadingCollector:
 
     @staticmethod
-    async def save_reading(session:AsyncSession,lecture: EntireMeasure) -> bool: 
-        try:
-            
-                try:
-                     # 1. Obtener ID del medidor
-                    idReadMeter = await session.scalar(
-                        select(Meter.id).where(Meter.serial_number == lecture.serial_number)
-                    )
-                    if not idReadMeter:
-                        logger.error(f'Meter with SN: {lecture.serial_number} not registered')
-                        return False
-                
-                except Exception as e:
-                    logger.error(f'Error looking for SN: {lecture.serial_number} → {e}')
-                    return
+    async def save_reading(lecture: EntireMeasure,session:AsyncSession) -> bool: 
 
-                new_measurement= Measurement(
-                    meter_id=idReadMeter,
-                    timestamp=lecture.timestamp,
-                    parameters=lecture.parameters
-                )
-                
-                try:
-                    session.add(new_measurement)
-                    await session.commit() #Final de microservicio 
-                
-                    try: #Envío a Rabbit como trigger para el evaluador
-                        await send_id('MQTT',new_measurement.id, settings.rabbit_url)
-                    except:
-                        logger.error("Error comms queue")
-                    return True
-                except:
-                    logger.error("Error committing")
-                    return False
-        except:
-            logger.error("Error saving measurement")
+        try:
+            #Obtener el id del medidor que quiere guardar la lectura
+            idReadMeter = await session.scalar(
+                select(Meter.id).where(Meter.serial_number == lecture.serial_number)
+            )
+
+            if not idReadMeter:
+                logger.error(f'Meter with SN: {lecture.serial_number} not registered')
+                return False
+
+            #Guardar la lectura según su medidor correspondiente
+            new_measurement= Measurement(
+                meter_id=idReadMeter,
+                timestamp=lecture.timestamp,
+                parameters=lecture.parameters
+            )
+        
+            session.add(new_measurement)
+            await session.flush()
+            await session.commit() 
+
+        except Exception:
+            logger.exception("Error saving reading on DB")
             await session.rollback()
             return False
-    
 
+        try: #Envío a Rabbit como trigger para el evaluador
+            await send_id('MQTT',new_measurement.id, settings.rabbit_url)
+        except Exception:
+            logger.exception("Error on uS comms")
 
-
-
-
+        return True
