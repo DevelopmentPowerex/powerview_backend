@@ -1,0 +1,132 @@
+services:
+  mosquitto:
+    image: eclipse-mosquitto:2
+    container_name: mosquitto
+    ports:
+      - "1883:1883"
+    volumes:
+      - ./docker/mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+      - mosquitto_data:/mosquitto/data
+      - mosquitto_log:/mosquitto/log
+    environment:
+      TZ: America/Guayaquil
+    restart: unless-stopped
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"    # AMQP
+      - "15672:15672"  # Web UI
+    environment:
+      RABBITMQ_DEFAULT_USER: powerview
+      RABBITMQ_DEFAULT_PASS: powerview
+      TZ: America/Guayaquil
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    restart: unless-stopped 
+
+  postgres:
+    image: postgres:17
+    container_name: postgres
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_DB: powerview
+      POSTGRES_USER: jera
+      POSTGRES_PASSWORD: "105181"
+      TZ: America/Guayaquil
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U jera -d powerview"]
+      interval: 5s
+      timeout: 5s
+      retries: 15
+
+  gateway:
+    build:
+      context: .
+      dockerfile: ./AlwaysOn/uS_gateway/DockerFile
+    container_name: gateway
+    env_file:
+      - AlwaysOn/uS_gateway/.env.docker
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      TZ: America/Guayaquil
+    restart: unless-stopped
+
+  mqtt_collector:
+    build:
+      context: .
+      dockerfile: ./AlwaysOn/uS/collector/DockerFile
+    container_name: mqtt_collector
+    env_file:
+      - AlwaysOn/uS/collector/.env.docker
+    environment:
+      TZ: America/Guayaquil
+    depends_on:
+      mosquitto:
+        condition: service_started
+      rabbitmq:
+        condition: service_started
+      postgres:
+        condition: service_healthy
+      gateway:
+        condition: service_started
+
+    restart: unless-stopped
+
+  reading_evaluator:
+      build:
+        context: .
+        dockerfile: ./AlwaysOn/uS/evaluator/DockerFile
+      container_name: reading_evaluator
+      env_file:
+        - AlwaysOn/uS/evaluator/.env.docker
+      environment:
+        TZ: America/Guayaquil
+      depends_on:
+        rabbitmq:
+          condition: service_started
+        postgres:
+          condition: service_healthy
+        gateway:
+          condition: service_started
+
+      restart: unless-stopped
+
+  notifier:
+      build:
+        context: .
+        dockerfile: ./AlwaysOn/uS/notifier/DockerFile
+      container_name: notifier
+      env_file:
+        - AlwaysOn/uS/notifier/.env.docker
+      environment:
+        TZ: America/Guayaquil
+      depends_on:
+        rabbitmq:
+          condition: service_started
+        postgres:
+          condition: service_healthy
+        gateway:
+          condition: service_started
+
+      restart: unless-stopped
+
+
+volumes:
+  mosquitto_data:
+  mosquitto_log:
+  rabbitmq_data:
+  postgres_data:
+  mqtt_collector_data:
+  evaluator_data:
+  notifier_data:
+

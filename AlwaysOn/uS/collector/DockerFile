@@ -1,0 +1,25 @@
+FROM python:3.12-slim
+
+WORKDIR /app
+
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+
+# Importante para que "from DB.database import ..." funcione
+ENV PYTHONPATH=/app/AlwaysOn
+
+# Dependencias del sistema (útiles para wheels/compilación si alguna lib lo requiere)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential gcc git \
+ && rm -rf /var/lib/apt/lists/*
+
+# Instalar dependencias del servicio 
+COPY AlwaysOn/uS/collector/requirements_collector_docker.txt /app/requirements_collector_docker.txt
+
+RUN pip install --no-cache-dir -r /app/requirements_collector_docker.txt
+
+# Copiamos el repo completo para incluir AlwaysOn/DB y el resto del código compartido
+COPY . /app
+
+# Ejecuta el gateway. Ajusta si tu app no se llama "app".
+CMD ["python", "-m","uS.collector.mqtt_suscriber"]

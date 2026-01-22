@@ -1,0 +1,26 @@
+FROM python:3.12-slim
+
+WORKDIR /app
+
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+
+# Importante para que "from DB.database import ..." funcione
+ENV PYTHONPATH=/app/AlwaysOn
+
+# Dependencias del sistema (útiles para wheels/compilación si alguna lib lo requiere)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential gcc git \
+ && rm -rf /var/lib/apt/lists/*
+
+# Instalar dependencias del gateway (tu archivo está en uS_gateway)
+COPY AlwaysOn/uS_gateway/requirements_gtw.txt /app/requirements_gtw.txt
+RUN pip install --no-cache-dir -r /app/requirements_gtw.txt
+
+# Copiamos el repo completo para incluir AlwaysOn/DB y el resto del código compartido
+COPY . /app
+
+EXPOSE 8000
+
+# Ejecuta el gateway. Ajusta si tu app no se llama "app".
+CMD ["python", "-m", "uvicorn", "uS_gateway.main:app", "--host", "0.0.0.0", "--port", "8000"]
