@@ -1,34 +1,76 @@
-# Python caches
-**/__pycache__/
+################################
+# 🔐 ENV / SECRETOS
+################################
+**/.env
+**/.env.*
+!.env.example
+!.env.*.example
+
+################################
+# 🐍 PYTHON
+################################
 __pycache__/
 *.py[cod]
+*.pyd
+*.so
 
-# Virtual envs
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+################################
+# 🧪 ENTORNOS VIRTUALES
+################################
 .venv/
 venv/
-venv_*/
-*/venv_*/
-*/.venv/
-**/venv*/
-**/.venv*/
-**/venv/
-**/.venv/
+env/
+ENV/
 
-# Env files (NO subir local)
-.env
-.env.*
-!.env.example
+AlwaysOn/**/venv_*/
+AlwaysOn/**/env_*/
 
-# Logs
-**/*.log
-
-# OS/editor
-.DS_Store
-Thumbs.db
+################################
+# 🧠 IDE / EDITOR
+################################
 .vscode/
 .idea/
+*.swp
+*.swo
 
-# Build / packaging
-**/build/
-**/dist/
+################################
+# 🖥️ OS
+################################
+.DS_Store
+Thumbs.db
+
+################################
+# 📦 BUILD / METADATA
+################################
 *.egg-info/
+backend_pv.egg-info/
+dist/
+build/
+
+################################
+# 📜 LOGS
+################################
+*.log
+logs/
+
+################################
+# 🐳 DOCKER (datos locales)
+################################
+docker/**/data/
+docker/**/log/
+docker/**/logs/
+docker/**/backup/
+docker/**/backups/
+docker/**/tmp/
+
+################################
+# 🚫 CACHE ESPECÍFICO DE TU PROYECTO
+################################
+AlwaysOn/**/__pycache__/
+AlwaysOn/**/.pytest_cache/

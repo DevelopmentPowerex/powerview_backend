@@ -1,37 +1,57 @@
-# Python caches
-**/__pycache__/
-__pycache__/
-*.py[cod]
+################################
+# GIT / IDE
+################################
+.git
+.vscode
+.idea
 
-# Virtual envs
+################################
+# PYTHON CACHE
+################################
+**/__pycache__/
+**/*.pyc
+**/*.pyo
+**/*.pyd
+**/.pytest_cache/
+**/.mypy_cache/
+**/.ruff_cache/
+
+################################
+# VIRTUAL ENVS
+################################
 .venv/
 venv/
-venv_*/
-*/venv_*/
-*/.venv/
-**/venv*/
-**/.venv*/
-**/venv/
-**/.venv/
+env/
+ENV/
 
-# Env files (NO subir local)
-.env
-.env.*
-!.env.docker
+AlwaysOn/**/venv_*/
+AlwaysOn/**/env_*/
 
-# Logs
+################################
+# ENV FILES (NUNCA al contenedor)
+################################
+**/.env
+**/.env.*
+!.env.example
+
+################################
+# LOGS
+################################
 **/*.log
+logs/
 
-# OS/editor
+################################
+# DOCKER LOCAL DATA
+################################
+docker/**/data/
+docker/**/log/
+docker/**/logs/
+docker/**/backup/
+docker/**/backups/
+docker/**/tmp/
+
+################################
+# OS
+################################
 .DS_Store
 Thumbs.db
-.vscode/
-.idea/
-
-# Build / packaging
-**/build/
-**/dist/
-*.egg-info/
-
-docker/postgres/backups/
-*.log
