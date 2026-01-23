@@ -17,7 +17,7 @@ class Settings:
     env: str = os.getenv("ENV", "local")
     log_level: str = os.getenv("LOG_LEVEL", "INFO").upper()
     
-    rabbit_thread:str = os.getenv("RABBIT_THREAD", 'EV_SEND')
+    rabbit_thread:str = os.getenv("RABBIT_COLLECTOR_THREAD", 'EV_SEND')
     rabbit_url:str=os.getenv("RABBIT_URL","amqp://guest:guest@localhost/")
     
     db_url:str=os.getenv("DB_URL","postgresql+asyncpg://jera:105181@localhost:5432/powerview")

@@ -18,7 +18,7 @@ class Settings:
     mqtt_identifier: str = os.getenv("MQTT_IDENTIFIER", "powerview_developer")
     mqtt_timeout: int = env_int("MQTT_TIMEOUT", 60)
 
-    gateway_url: str = os.getenv("GATEWAY_URL", "http://127.0.0.1:8000/permanent/reading_collector")
+    gateway_url: str = os.getenv("GATEWAY_COLLECTOR_URL", "http://127.0.0.1:8000/permanent/reading_collector")
     gateway_timeout:int=env_int("GATEWAY_TIMEOUT",30)
     tasks_max: int = env_int("TASKS_MAX", 50)
 
