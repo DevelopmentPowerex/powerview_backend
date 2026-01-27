@@ -57,7 +57,9 @@ async def send_email(email_data:Dict[str,Any],alarm_html:str):
             img.add_header('Content-Disposition', 'inline', filename=img_file)
             msg.attach(img)
 
+    
     try:
+        logger.debug(f'Sending email')
         with smtplib.SMTP_SSL(settings.smtp_server, settings.smtp_port) as server:
             server.login(settings.smtp_user, settings.smtp_password) 
             server.send_message(msg)

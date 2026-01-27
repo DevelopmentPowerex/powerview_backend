@@ -138,7 +138,7 @@ async def email_builder(email_data:Dict[str,Any],counter_notif:int)->str:
         
         </body>
         </html>"""
-        
+        logger.debug(f'Email body built')
         return alarm_html
     
     except Exception as e:

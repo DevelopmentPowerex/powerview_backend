@@ -11,11 +11,11 @@ class Settings:
     env: str = os.getenv("ENV", "local")
     log_level: str = os.getenv("LOG_LEVEL", "INFO").upper()
 
-    gateway_url: str = os.getenv("GATEWAY_NOTIFIER_URL", "http://127.0.0.1:8000/permanent/alarm_processing")
+    gateway_url: str = os.getenv("GATEWAY_NOTIFIER_URL", "http://gateway:8000/permanent/alarm_processing")
     gateway_timeout:int=env_int("GATEWAY_TIMEOUT",30)
     tasks_max: int = env_int("TASKS_MAX", 50)
     rabbit_thread:str = os.getenv("RABBIT_NOTIFIER_THREAD", "NOTIF")
-    rabbit_URL:str = os.getenv("RABBIT_URL","amqp://guest:guest@localhost/")
+    rabbit_URL:str = os.getenv("RABBIT_URL","amqp://powerview:powerview@rabbitmq/")
     
     smtp_server:str = os.getenv("SMTP_SERVER","mail.premium-energia.com")
     smtp_port:int = env_int("SMTP_PORT",465)
