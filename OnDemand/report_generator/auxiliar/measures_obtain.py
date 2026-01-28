@@ -6,34 +6,16 @@ from typing import Optional,Any,Dict,List
 
 from statistics import mean
 
+from ..config import settings
+from ..protocols.auxiliar_info import PARAMETERS_FILTER
+
 import logging
 logger = logging.getLogger(__name__)
-
-GATEWAY_URL = "http://127.0.0.1:8000/displayable"  # URL del endpoint del gateway interno
-
-PARAMETERS_FILTER=[# Parametros que se deben eliminar de la extracción por falta de uso
-    "Signal_strength", #Frecuencia e intensidad de señal de transmisión
-    "P_Active_demand", ##Demanda de potencia activa positiva actual
-    "ICCID", #identificador único de placa
-    "PT", #Valor de transformador de potencia del medidor
-    "CT", #Valor de transformador de corriente del medidor (relación de transformación)
-    "R_Active_demand", #Demanda de potencia activa inversa actual
-    "P_Reactive_demand", #Demanda de potencia reactiva positiva actual
-    "R_Reactive_demand", #Demanda de potencia reactiva inversa actual
-    "kWh_spike", #Energía total activa en "periodo spike"
-    "kWh_peak", #Energía total activa en "periodo peak"
-    "kWh_flat", #Energía total activa en "periodo flat"
-    "kWh_valley", #Energía total activa en "periodo valley"
-    "C1_kvarh", #Energía reactiva en 1er cuadrante
-    "C2_kvarh", #Energía reactiva en 2do cuadrante
-    "C3_kvarh", #Energía reactiva en 3er cuadrante
-    "C4_kvarh"  #Energía reactiva en 4to cuadrante 
-] 
 
 async def extract_measures(meter_id:int,start_date:datetime,end_date:datetime,client:httpx.AsyncClient):
     try:
         response = await client.get(
-            f"{GATEWAY_URL}/extract_measures/",
+            f"{settings.gateway_url}/extract_measures/",
             params={"meter_id":meter_id,
                     "start_date":start_date,
                     "end_date":end_date,
@@ -49,8 +31,8 @@ async def extract_measures(meter_id:int,start_date:datetime,end_date:datetime,cl
 
         return response_data
     
-    except Exception as e:
-        logger.error(f"Something went wrong while asking for the measure register: {e}")
+    except Exception:
+        logger.exception(f"Something went wrong while asking for the measure register")
 
 async def data_filter(unfiltered:List)->Optional[List[Dict[str,Any]]]:
     
@@ -99,7 +81,7 @@ async def extract_all(meter_id:int,start_date:datetime,end_date:datetime):
             extracted_measurements = await extract_measures(meter_id,start_date,end_date,client) 
             
             if not extracted_measurements:
-                logger.error('No measures returned')    
+                logger.error(f'No measures returned for meter {meter_id}')    
                 return None
             
             filtered_measurements=await data_filter(extracted_measurements)
@@ -116,8 +98,8 @@ async def extract_all(meter_id:int,start_date:datetime,end_date:datetime):
             
             return filtered_measurements,extreme_values   #retornar los valores extremos dentro del rango y las mediciones completas
 
-        except Exception as e:
-            logger.error(f'Unexpected error in main process: {e}')
+        except Exception:
+            logger.exception(f'Unexpected error in main process')
 
 if __name__ == "__main__":  
 

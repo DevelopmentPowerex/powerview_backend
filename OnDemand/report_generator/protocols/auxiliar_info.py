@@ -97,7 +97,6 @@ PARAMETERS_FOR_REPORT={
  
 }
 
-
 DATOS_PRUEBA=[
         {'meter_id': 1, 'parameters': {'F': 59.96, 'P': 2.48, 'Q': -1.68, 'S': 3.04, 'PA': 0.24, 'PB': 1.92, 'PC': 0.28, 'PF': 0.82, 'QA': -0.52, 'QB': -0.6, 'QC': -0.6, 'SA': 0.56, 'SB': 2, 'SC': 0.68, 'TA': 0, 'TB': 0, 'TC': 0, 'TN': 0, 'iA': 5.53, 'iB': 17.09, 'iC': 6.34, 'iF': 0, 'vA': 122.6, 'vB': 120.1, 'vC': 128.7, 'PFA': 0.454, 'PFB': 0.954, 'PFC': 0.44, 'vAB': 210.1, 'vBC': 215.5, 'vCA': 217.6, 'I_unb': 124.28, 'THD_A': 6.12, 'THD_B': 4.58, 'THD_C': 4.51, 'V_unb': 6.78, 'THDC_A': 50, 'THDC_B': 11.9, 'THDC_C': 61.53, 'P_kWh_A': 17.6, 'P_kWh_B': 408, 'P_kWh_C': 335.2, 'P_kWh_T': 1086.4, 'R_kWh_A': 0, 'R_kWh_B': 0, 'R_kWh_C': 0, 'R_kWh_T': 0, 'DI_status': 0, 'P_kvarh_A': 4.4, 'P_kvarh_B': 1.6, 'P_kvarh_C': 2.4, 'P_kvarh_T': 26.8, 'R_kvarh_A': 88, 'R_kvarh_B': 134, 'R_kvarh_C': 142.4, 'R_kvarh_T': 510.4}, 'timestamp': '2025-08-25T10:49:42'}, 
         {'meter_id': 1, 'parameters': {'F': 59.98, 'P': 2.48, 'Q': -1.68, 'S': 3.04, 'PA': 0.24, 'PB': 1.88, 'PC': 0.32, 'PF': 0.819, 'QA': -0.52, 'QB': -0.6, 'QC': -0.6, 'SA': 0.56, 'SB': 2, 'SC': 0.68, 'TA': 0, 'TB': 0, 'TC': 0, 'TN': 0, 'iA': 5.53, 'iB': 16.82, 'iC': 6.4, 'iF': 0, 'vA': 122.3, 'vB': 120.3, 'vC': 129.4, 'PFA': 0.457, 'PFB': 0.953, 'PFC': 0.47, 'vAB': 210.1, 'vBC': 216.2, 'vCA': 218, 'I_unb': 124.28, 'THD_A': 6.06, 'THD_B': 4.65, 'THD_C': 4.71, 'V_unb': 7.49, 'THDC_A': 50, 'THDC_B': 12.19, 'THDC_C': 61.53, 'P_kWh_A': 17.6, 'P_kWh_B': 408, 'P_kWh_C': 335.2, 'P_kWh_T': 1086.4, 'R_kWh_A': 0, 'R_kWh_B': 0, 'R_kWh_C': 0, 'R_kWh_T': 0, 'DI_status': 0, 'P_kvarh_A': 4.4, 'P_kvarh_B': 1.6, 'P_kvarh_C': 2.4, 'P_kvarh_T': 26.8, 'R_kvarh_A': 88, 'R_kvarh_B': 134, 'R_kvarh_C': 142.4, 'R_kvarh_T': 510.4}, 'timestamp': '2025-08-25T10:50:42'}, 
@@ -186,3 +185,129 @@ M3_MAPPING={ # Mapeo de constantes de mensaje PV-M3
     71: "C3_kvarh", #Energía reactiva en 3er cuadrante
     72: "C4_kvarh"  #Energía reactiva en 4to cuadrante 
 }
+
+PARAMETER_TRANSLATION={
+    "vA":('V','Voltaje entre Fase A  y Neutro [vA]'),
+    "vB":('V','Voltaje entre Fase B  y Neutro [vB]'),
+    "vC":('V','Voltaje entre Fase C  y Neutro [vC]'),
+    "vAB":('V','Voltaje entre Fases  A y B [vAB]'),
+    "vBC":('V','Voltaje entre Fases  B y C [vBC]'),
+    "vCA":('V','Voltaje entre Fases  C y A [vCA]'),
+    "iA":('A','Corriente en Fase A [iA]'),
+    "iB":('A','Corriente en Fase B [iB]'),
+    "iC":('A','Corriente en Fase C [iC]'), 
+    "PA":('W','Potencia Activa en Fase A [PA]'),
+    "PB":('W','Potencia Activa en Fase B [PB]'), 
+    "PC":('W','Potencia Activa en Fase C [PC]'),
+    "P":('W','Potencia Activa Total [P]'),
+    "QA":('VAR','Potencia Reactiva en Fase A [QA]'), 
+    "QB":('VAR','Potencia Reactiva en Fase B [QB]'),
+    "QC":('VAR','Potencia Reactiva en Fase C [QC]'),
+    "Q":('VAR','Potencia Reactiva Total [Q]'),
+    "SA":('VA','Potencia Aparente en Fase A [SA]'),
+    "SB":('VA','Potencia Aparente en Fase B [SB]'), 
+    "SC":('VA','Potencia Aparente en Fase C [SC]'), 
+    "S" :('VA','Potencia Aparente Total [S]'),
+    "PFA":('','Factor de Potencia en Fase A [PFA]'),
+    "PFB":('','Factor de Potencia en Fase B [PFB]'),
+    "PFC":('','Factor de Potencia en Fase C [PFC]'),
+    "PF":('','Factor de Potencia General [PF]'),
+    "F":('Hz','Frecuencia [F]'), 
+    "TA":('°C','Temperatura en Fase A [TA]'),
+    "TB":('°C','Temperatura en Fase B [TB]'), 
+    "TC":('°C','Temperatura en Fase C [TC]'), 
+    "TN":('°C','Temperatura en Neutro [N]'),
+    "iF":('A','Corriente de Fuga [iF]'),
+    "V_unb":('%','Porcentaje de Desbalance de Voltaje'),
+    "I_unb":('%','Porcentaje de Desbalance de Corriente'),
+    "P_kWh_T":('kWh','Energía Activa Positiva Total') ,
+    "R_kWh_T":('kWh','Energía Activa Inversa Total'),
+    "P_kvarh_T":('kVarh','Energía Reactiva Positiva Total'),
+    "R_kvarh_T":('kVarh','Energía Reactiva Inversa Total'),
+    "DI_status":('bit','Estado de las entradas digitales'), #(bit0:DI1,bit1:DI2,bit2:DI3,bit3:DI4)
+    "P_kWh_A":('kWh','Energía activa en A: Positiva'),
+    "R_kWh_A":('kWh','Energía activa en A: Inversa'),
+    "P_kvarh_A":('kVarh','Energía reactiva en A: Positiva'),
+    "R_kvarh_A":('kVarh','Energía reactiva en A: Inversa'),
+    "P_kWh_B":('kWh','Energía activa en B: Positiva'),
+    "R_kWh_B":('kWh','Energía activa en B: Inversa'),
+    "P_kvarh_B":('kVarh','Energía reactiva en B: Positiva'),
+    "R_kvarh_B":('kVarh','Energía reactiva en B: Inversa'),
+    "P_kWh_C":('kWh','Energía activa en C: Positiva'),
+    "R_kWh_C":('kWh','Energía activa en C: Inversa'),
+    "P_kvarh_C":('kVarh','Energía reactiva en C: Positiva'),
+    "R_kvarh_C":('kVarh','Energía reactiva en A: Inversa'),
+    "THD_A":('%','Rate de armónicos en A'),
+    "THD_B":('%','Rate de armónicos en B'),
+    "THD_C":('%','Rate de armónicos en C'),
+    "THDC_A":('%','Rate de armónicos de corriente en A'), 
+    "THDC_B":('%','Rate de armónicos de corriente en B'), 
+    "THDC_C":('%','Rate de armónicos de corriente en C')
+}
+
+PARAMETERS_FOR_EVENTS={
+    "vA":'Voltaje entre Fase A  y Neutro [V]',
+    "vB":'Voltaje entre Fase B  y Neutro [V]',
+    "vC":'Voltaje entre Fase C  y Neutro [V]',
+
+    "vAB":'Voltaje entre Fases  A y B [V]',
+    "vBC":'Voltaje entre Fases  B y C [V]',
+    "vCA":'Voltaje entre Fases  C y A [V]',
+
+    "iA":'Corriente en Fase A [A]',
+    "iB":'Corriente en Fase B [A]',
+    "iC":'Corriente en Fase C [A]', 
+
+    "PA":'Potencia Activa en Fase A [kW]',
+    "PB":'Potencia Activa en Fase B [kW]', 
+    "PC":'Potencia Activa en Fase C [kW]',
+    "P":'Potencia Activa Total [kW]',
+
+    "QA":'Potencia Reactiva en Fase A [kVar]', 
+    "QB":'Potencia Reactiva en Fase B [kVar]',
+    "QC":'Potencia Reactiva en Fase C [kVar]',
+    "Q":'Potencia Reactiva Total [kVar]',
+
+    "SA":'Potencia Aparente en Fase A [kVA]',
+    "SB":'Potencia Aparente en Fase B [kVA]', 
+    "SC":'Potencia Aparente en Fase C [kVA]', 
+    "S" :'Potencia Aparente Total [kVA]',
+
+    "PF":'Factor de Potencia General',
+    "F":'Frecuencia [Hz]', 
+
+    "P_kWh_A":'Energía activa en A: Positiva [kWh]',
+    "P_kWh_B":'Energía activa en B: Positiva [kWh]',
+    "P_kWh_C":'Energía activa en C: Positiva [kWh]',
+    "P_kWh_T":'Energía Activa Positiva Total [kWh]',
+
+    "R_kWh_A":'Energía activa en A: Inversa [kWh]',
+    "R_kWh_B":'Energía activa en B: Inversa [kWh]',
+    "R_kWh_C":'Energía activa en C: Inversa [kWh]',
+    "R_kWh_T":'Energía Activa Inversa Total [kWh]',
+
+    "P_kvarh_A":'Energía reactiva en A: Positiva [kVarh]',
+    "P_kvarh_B":'Energía reactiva en B: Positiva [kVarh]',
+    "P_kvarh_C":'Energía reactiva en C: Positiva [kVarh]',
+    "P_kvarh_T":'Energía Reactiva Positiva Total [kVarh]',
+
+    "R_kvarh_A":'Energía reactiva en A: Inversa [kVarh]',
+    "R_kvarh_B":'Energía reactiva en B: Inversa [kVarh]',
+    "R_kvarh_C":'Energía reactiva en C: Inversa [kVarh]',
+    "R_kvarh_T":'Energía Reactiva Inversa Total [kVarh]',
+}
+
+PARAMETERS_CHART_ORDER={
+    "Voltajes por línea [V]":"V_all_1",
+    "Voltajes por fase [V]":"V_all_2",
+    "Corrientes por línea [A]":"I_all",
+    "Potencia Activa [W]":"P_all",
+    "Potencia Reactiva [VAR]":"Q_all",
+    "Potencia Aparente [VA]":"S_all",
+    "Frecuencia[Hz]":'F',
+    'Factor de Potencia General':'PF',
+}
+
+TEMPLATE_DIR = "OnDemand/uS/generate_report/static/templates/"
+
+OUTPUT_HTML = "OnDemand/uS/generate_report/result/editable_report.html"
