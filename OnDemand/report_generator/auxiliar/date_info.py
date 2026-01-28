@@ -1,10 +1,9 @@
 import asyncio
 from datetime import datetime, date
-import logging
 from typing import Optional,Any,Dict
 
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger('date_range')
+import logging
+logger = logging.getLogger(__name__)
 
 async def get_csv_date(start_date:str,end_date:str)->Optional[str]:
     try:
@@ -56,7 +55,6 @@ async def report_info(start_report:str,end_report:str)->Optional[Dict[str,Any]]:
     }
 
     return report_info
-
 
 if __name__ == "__main__":  
     

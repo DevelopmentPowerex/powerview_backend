@@ -1,18 +1,37 @@
-import asyncio
-from datetime import datetime
-import logging
-from typing import Optional, Any, Dict, List
-import matplotlib.pyplot as plt
-import matplotlib.dates as mdates
-from matplotlib.ticker import MaxNLocator, FixedLocator
-from datetime import datetime, timedelta
-import numpy as np
-import pandas as pd
 
-# Configurar un estilo más profesional
-plt.style.use('seaborn-v0_8-whitegrid')
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger('graph_generator')
+PREMADE_ORDERS={
+    "V_all_1":(['vA','vB','vC'],'chart_voltage_PN'),
+    "V_all_2":(['vAB','vBC','vCA'],'chart_voltage_PP'),
+    "I_all":(['iA','iB','iC'],'chart_current'),
+    "P_all":(['PA','PB','PC','P'],'chart_active_power'),
+    "Q_all":(['QA','QB','QC','Q'],'chart_reactive_power'),
+    "S_all":(['SA','SB','SC','S'],'chart_aparent_power'),
+    "Wh_all_p":(["P_kWh_A","P_kWh_B","P_kWh_C","P_kWh_T"],'chart_active_positive_energy'),
+    "Wh_all_r":(["R_kWh_A","R_kWh_B","R_kWh_C","R_kWh_T"],'chart_active_reverse_energy'),
+    "varh_all_p":(["P_kvarh_A","P_kvarh_B","P_kvarh_C","P_kvarh_T"],'chart_reactive_positive_energy'),
+    "varh_all_r":(["R_kvarh_A","R_kvarh_B","R_kvarh_C","R_kvarh_T"],'chart_reactive_reverse_energy'),
+    'F':(['F'],'chart_frequency'),
+    'PF':(['PF'],'chart_power_factor')
+}
+
+PARAMETERS_FILTER=[# Parametros que se deben eliminar de la extracción por falta de uso
+    "Signal_strength", #Frecuencia e intensidad de señal de transmisión
+    "P_Active_demand", ##Demanda de potencia activa positiva actual
+    "ICCID", #identificador único de placa
+    "PT", #Valor de transformador de potencia del medidor
+    "CT", #Valor de transformador de corriente del medidor (relación de transformación)
+    "R_Active_demand", #Demanda de potencia activa inversa actual
+    "P_Reactive_demand", #Demanda de potencia reactiva positiva actual
+    "R_Reactive_demand", #Demanda de potencia reactiva inversa actual
+    "kWh_spike", #Energía total activa en "periodo spike"
+    "kWh_peak", #Energía total activa en "periodo peak"
+    "kWh_flat", #Energía total activa en "periodo flat"
+    "kWh_valley", #Energía total activa en "periodo valley"
+    "C1_kvarh", #Energía reactiva en 1er cuadrante
+    "C2_kvarh", #Energía reactiva en 2do cuadrante
+    "C3_kvarh", #Energía reactiva en 3er cuadrante
+    "C4_kvarh"  #Energía reactiva en 4to cuadrante 
+] 
 
 PARAMETERS_FOR_REPORT={
     "V_all_1":('V','VOLTAJES FASE NEUTRO'),
@@ -78,22 +97,8 @@ PARAMETERS_FOR_REPORT={
  
 }
 
-PREMADE_ORDERS={
-    "V_all_1":(['vA','vB','vC'],'chart_voltage_PN'),
-    "V_all_2":(['vAB','vBC','vCA'],'chart_voltage_PP'),
-    "I_all":(['iA','iB','iC'],'chart_current'),
-    "P_all":(['PA','PB','PC','P'],'chart_active_power'),
-    "Q_all":(['QA','QB','QC','Q'],'chart_reactive_power'),
-    "S_all":(['SA','SB','SC','S'],'chart_aparent_power'),
-    "Wh_all_p":(["P_kWh_A","P_kWh_B","P_kWh_C","P_kWh_T"],'chart_active_positive_energy'),
-    "Wh_all_r":(["R_kWh_A","R_kWh_B","R_kWh_C","R_kWh_T"],'chart_active_reverse_energy'),
-    "varh_all_p":(["P_kvarh_A","P_kvarh_B","P_kvarh_C","P_kvarh_T"],'chart_reactive_positive_energy'),
-    "varh_all_r":(["R_kvarh_A","R_kvarh_B","R_kvarh_C","R_kvarh_T"],'chart_reactive_reverse_energy'),
-    'F':(['F'],'chart_frequency'),
-    'PF':(['PF'],'chart_power_factor')
-}
 
-DATOS=[
+DATOS_PRUEBA=[
         {'meter_id': 1, 'parameters': {'F': 59.96, 'P': 2.48, 'Q': -1.68, 'S': 3.04, 'PA': 0.24, 'PB': 1.92, 'PC': 0.28, 'PF': 0.82, 'QA': -0.52, 'QB': -0.6, 'QC': -0.6, 'SA': 0.56, 'SB': 2, 'SC': 0.68, 'TA': 0, 'TB': 0, 'TC': 0, 'TN': 0, 'iA': 5.53, 'iB': 17.09, 'iC': 6.34, 'iF': 0, 'vA': 122.6, 'vB': 120.1, 'vC': 128.7, 'PFA': 0.454, 'PFB': 0.954, 'PFC': 0.44, 'vAB': 210.1, 'vBC': 215.5, 'vCA': 217.6, 'I_unb': 124.28, 'THD_A': 6.12, 'THD_B': 4.58, 'THD_C': 4.51, 'V_unb': 6.78, 'THDC_A': 50, 'THDC_B': 11.9, 'THDC_C': 61.53, 'P_kWh_A': 17.6, 'P_kWh_B': 408, 'P_kWh_C': 335.2, 'P_kWh_T': 1086.4, 'R_kWh_A': 0, 'R_kWh_B': 0, 'R_kWh_C': 0, 'R_kWh_T': 0, 'DI_status': 0, 'P_kvarh_A': 4.4, 'P_kvarh_B': 1.6, 'P_kvarh_C': 2.4, 'P_kvarh_T': 26.8, 'R_kvarh_A': 88, 'R_kvarh_B': 134, 'R_kvarh_C': 142.4, 'R_kvarh_T': 510.4}, 'timestamp': '2025-08-25T10:49:42'}, 
         {'meter_id': 1, 'parameters': {'F': 59.98, 'P': 2.48, 'Q': -1.68, 'S': 3.04, 'PA': 0.24, 'PB': 1.88, 'PC': 0.32, 'PF': 0.819, 'QA': -0.52, 'QB': -0.6, 'QC': -0.6, 'SA': 0.56, 'SB': 2, 'SC': 0.68, 'TA': 0, 'TB': 0, 'TC': 0, 'TN': 0, 'iA': 5.53, 'iB': 16.82, 'iC': 6.4, 'iF': 0, 'vA': 122.3, 'vB': 120.3, 'vC': 129.4, 'PFA': 0.457, 'PFB': 0.953, 'PFC': 0.47, 'vAB': 210.1, 'vBC': 216.2, 'vCA': 218, 'I_unb': 124.28, 'THD_A': 6.06, 'THD_B': 4.65, 'THD_C': 4.71, 'V_unb': 7.49, 'THDC_A': 50, 'THDC_B': 12.19, 'THDC_C': 61.53, 'P_kWh_A': 17.6, 'P_kWh_B': 408, 'P_kWh_C': 335.2, 'P_kWh_T': 1086.4, 'R_kWh_A': 0, 'R_kWh_B': 0, 'R_kWh_C': 0, 'R_kWh_T': 0, 'DI_status': 0, 'P_kvarh_A': 4.4, 'P_kvarh_B': 1.6, 'P_kvarh_C': 2.4, 'P_kvarh_T': 26.8, 'R_kvarh_A': 88, 'R_kvarh_B': 134, 'R_kvarh_C': 142.4, 'R_kvarh_T': 510.4}, 'timestamp': '2025-08-25T10:50:42'}, 
         {'meter_id': 1, 'parameters': {'F': 59.97, 'P': 4.72, 'Q': -0.88, 'S': 4.8, 'PA': 0.24, 'PB': 2.88, 'PC': 1.56, 'PF': 0.98, 'QA': -0.52, 'QB': -0.6, 'QC': 0.16, 'SA': 0.56, 'SB': 2.96, 'SC': 1.56, 'TA': 0, 'TB': 0, 'TC': 0, 'TN': 0, 'iA': 5.46, 'iB': 25.18, 'iC': 13.19, 'iF': 0, 'vA': 123.4, 'vB': 118.1, 'vC': 124, 'PFA': 0.438, 'PFB': 0.979, 'PFC': 0.993, 'vAB': 209.1, 'vBC': 209.6, 'vCA': 214.2, 'I_unb': 136.11, 'THD_A': 5.84, 'THD_B': 4.32, 'THD_C': 3.87, 'V_unb': 5.34, 'THDC_A': 54.54, 'THDC_B': 8.06, 'THDC_C': 21.87, 'P_kWh_A': 17.6, 'P_kWh_B': 408.4, 'P_kWh_C': 335.2, 'P_kWh_T': 1086.8, 'R_kWh_A': 0, 'R_kWh_B': 0, 'R_kWh_C': 0, 'R_kWh_T': 0, 'DI_status': 0, 'P_kvarh_A': 4.4, 'P_kvarh_B': 1.6, 'P_kvarh_C': 2.4, 'P_kvarh_T': 26.8, 'R_kvarh_A': 88, 'R_kvarh_B': 134, 'R_kvarh_C': 142.4, 'R_kvarh_T': 510.4}, 'timestamp': '2025-08-25T10:51:42'}, 
@@ -136,147 +141,48 @@ DATOS=[
         {'meter_id': 1, 'parameters': {'F': 60, 'P': 2.56, 'Q': -1.68, 'S': 3.04, 'PA': 0.24, 'PB': 1.96, 'PC': 0.28, 'PF': 0.828, 'QA': -0.48, 'QB': -0.6, 'QC': -0.6, 'SA': 0.56, 'SB': 2.04, 'SC': 0.68, 'TA': 0, 'TB': 0, 'TC': 0, 'TN': 0, 'iA': 5.5, 'iB': 17.27, 'iC': 6.29, 'iF': 0, 'vA': 120.2, 'vB': 121.2, 'vC': 128.6, 'PFA': 0.48, 'PFB': 0.956, 'PFC': 0.437, 'vAB': 209, 'vBC': 216.3, 'vCA': 215.5, 'I_unb': 124.28, 'THD_A': 6, 'THD_B': 4.45, 'THD_C': 4.28, 'V_unb': 6.64, 'THDC_A': 50, 'THDC_B': 11.9, 'THDC_C': 61.53, 'P_kWh_A': 17.6, 'P_kWh_B': 409.6, 'P_kWh_C': 335.6, 'P_kWh_T': 1088.4, 'R_kWh_A': 0, 'R_kWh_B': 0, 'R_kWh_C': 0, 'R_kWh_T': 0, 'DI_status': 0, 'P_kvarh_A': 4.4, 'P_kvarh_B': 1.6, 'P_kvarh_C': 2.4, 'P_kvarh_T': 26.8, 'R_kvarh_A': 88, 'R_kvarh_B': 134.4, 'R_kvarh_C': 142.8, 'R_kvarh_T': 511.6}, 'timestamp': '2025-08-25T11:28:42'},
         {'meter_id': 1, 'parameters': {'F': 59.98, 'P': 3.44, 'Q': -1.68, 'S': 3.84, 'PA': 0.24, 'PB': 2.92, 'PC': 0.28, 'PF': 0.894, 'QA': -0.52, 'QB': -0.56, 'QC': -0.6, 'SA': 0.56, 'SB': 2.96, 'SC': 0.68, 'TA': 0, 'TB': 0, 'TC': 0, 'TN': 0, 'iA': 5.5, 'iB': 25.79, 'iC': 6.3, 'iF': 0, 'vA': 122.5, 'vB': 115.9, 'vC': 130.4, 'PFA': 0.449, 'PFB': 0.98, 'PFC': 0.412, 'vAB': 206.4, 'vBC': 213.4, 'vCA': 219, 'I_unb': 166.3, 'THD_A': 6.13, 'THD_B': 4.4, 'THD_C': 4.37, 'V_unb': 11.62, 'THDC_A': 50, 'THDC_B': 6.25, 'THDC_C': 61.53, 'P_kWh_A': 17.6, 'P_kWh_B': 409.6, 'P_kWh_C': 335.6, 'P_kWh_T': 1088.4, 'R_kWh_A': 0, 'R_kWh_B': 0, 'R_kWh_C': 0, 'R_kWh_T': 0, 'DI_status': 0, 'P_kvarh_A': 4.4, 'P_kvarh_B': 1.6, 'P_kvarh_C': 2.4, 'P_kvarh_T': 26.8, 'R_kvarh_A': 88, 'R_kvarh_B': 134.4, 'R_kvarh_C': 142.8, 'R_kvarh_T': 511.6}, 'timestamp': '2025-08-25T11:29:42'},
         {'meter_id': 1, 'parameters': {'F': 59.98, 'P': 2.48, 'Q': -1.68, 'S': 3.04, 'PA': 0.24, 'PB': 1.96, 'PC': 0.28, 'PF': 0.824, 'QA': -0.48, 'QB': -0.6, 'QC': -0.6, 'SA': 0.56, 'SB': 2.04, 'SC': 0.68, 'TA': 0, 'TB': 0, 'TC': 0, 'TN': 0, 'iA': 5.53, 'iB': 17.15, 'iC': 6.28, 'iF': 0, 'vA': 121.2, 'vB': 121, 'vC': 128.9, 'PFA': 0.474, 'PFB': 0.955, 'PFC': 0.432, 'vAB': 209.7, 'vBC': 216.4, 'vCA': 216.6, 'I_unb': 124.28, 'THD_A': 6.11, 'THD_B': 4.46, 'THD_C': 4.34, 'V_unb': 6.38, 'THDC_A': 50, 'THDC_B': 11.9, 'THDC_C': 61.53, 'P_kWh_A': 17.6, 'P_kWh_B': 409.6, 'P_kWh_C': 335.6, 'P_kWh_T': 1088.4, 'R_kWh_A': 0, 'R_kWh_B': 0, 'R_kWh_C': 0, 'R_kWh_T': 0, 'DI_status': 0, 'P_kvarh_A': 4.4, 'P_kvarh_B': 1.6, 'P_kvarh_C': 2.4, 'P_kvarh_T': 26.8, 'R_kvarh_A': 88, 'R_kvarh_B': 134.4, 'R_kvarh_C': 142.8, 'R_kvarh_T': 511.6}, 'timestamp': '2025-08-25T11:30:42'},
-]                                                                                            
+]  
 
-TEMP_FOLDER_PATH=r'C:\Users\jeras\Documents\PowerView\backend_pv\OnDemand\uS\generate_report\temp\gen_graphs'
-ORDER_PATH='/OnDemand/uS/generate_report/temp/gen_graphs'
-
-async def chart_order(graph_order:List[str],measurements_data=List[Dict[str,Any]])->Optional[str]:
-
-    """
-    graph_order: Str de nombre de la receta del gráfico. Ejm: 'V_all_1' grafica 'vA','vB','vC'
-    
-    """
-    section_dict=measurements_data[0]
-    section_id=str(section_dict["meter_id"])
-
-    separator='_'
-    parameters_to_plot=PREMADE_ORDERS[graph_order[0]][0] if graph_order[0] in PREMADE_ORDERS.keys() else graph_order
-    data_dict = {}
-    for param in parameters_to_plot:
-        
-        ts_values = [
-            {
-                'timestamp': datetime.fromisoformat(measure['timestamp']).isoformat(), 
-                'parameters': {param: measure['parameters'][param]}
-            } for measure in measurements_data
-            ]
-        
-        data_dict[param] = ts_values
-
-    file_code=f'\{PREMADE_ORDERS[graph_order[0]][1]}' if graph_order[0] in PREMADE_ORDERS.keys() else f'chart_{separator.join(graph_order)}'
-    
-    graph_title=PARAMETERS_FOR_REPORT[graph_order[0]][1] if graph_order[0] in PREMADE_ORDERS.keys() else separator.join(graph_order)
-    
-    filename= TEMP_FOLDER_PATH+file_code+'_meter'+section_id
-    order_file=ORDER_PATH+file_code+'_meter'+section_id+'.png'
-
-    generated_chart=await create_line_chart(data_dict, parameters_to_plot, filename, graph_title)
-
-    return order_file
-
-async def create_line_chart(measurement_list:List[Dict[str,Any]], parameters_order:List[str], filename:str, graph_title:str,smooth_window=5):
-    fig, ax = plt.subplots(figsize=(10, 4))
-
-    line_colors = ["#0b4b79", '#ff7f0e', "#39a02c", '#d62728', '#9467bd', 
-                    '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf']
-
-    for i, parameter in enumerate(parameters_order):
-        # Extraer timestamps y valores
-        timestamps = [measurement['timestamp'] for measurement in measurement_list[parameter]]
-        values = [measurement['parameters'][parameter] for measurement in measurement_list[parameter]]
-        dates = [datetime.fromisoformat(ts) for ts in timestamps]
-
-        # Convertir a Series y suavizar
-        values_series = pd.Series(values, index=dates)
-        values_filled = values_series.interpolate(method='time')  # Rellenar con NaN para saltos vacíos
-
-        # Graficar línea suavizada
-        line_color = line_colors[i % len(line_colors)]
-        ax.plot(dates, values_series, color=line_color, linewidth=1.5, label=parameter, alpha=0.8)
-
-        # Máximo y mínimo
-        max_idx = values_filled.idxmax()
-        min_idx = values_filled.idxmin()
-        max_val = values_filled[max_idx]
-        min_val = values_filled[min_idx]
-
-        # Destacar max y mínimos del parametro graficado
-        ax.scatter([max_idx], [max_val], color=line_color, s=100, 
-                  marker='^', zorder=5, edgecolors='black', linewidth=1)
-        ax.scatter([min_idx], [min_val], color=line_color, s=100, 
-                  marker='v', zorder=5, edgecolors='black', linewidth=1)
-
-        # Etiquetas de valores máx y min
-        ax.annotate(f"Máx: {max_val:.2f}",
-                    xy=(max_idx, max_val),
-                    xytext=(0, 15), textcoords='offset points',
-                    ha='center', va='bottom',
-                    fontsize=9, fontweight='bold',
-                    bbox=dict(boxstyle="round,pad=0.3", fc="white", ec=line_color, alpha=0.8),
-                    arrowprops=dict(arrowstyle='->', lw=1.5, color=line_color))
-
-        ax.annotate(f"Mín: {min_val:.2f}",
-                    xy=(min_idx, min_val),
-                    xytext=(0, -25), textcoords='offset points',
-                    ha='center', va='top',
-                    fontsize=9, fontweight='bold',
-                    bbox=dict(boxstyle="round,pad=0.3", fc="white", ec=line_color, alpha=0.8),
-                    arrowprops=dict(arrowstyle='->', lw=1.5, color=line_color))
-
-    # Eje principal en X, marcas de hora
-    ax.xaxis.set_major_locator(MaxNLocator(nbins=7))
-    ax.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M:%S'))
-    plt.setp(ax.get_xticklabels(), rotation=0, ha="center")
-
-    # Eje secundario en X, marcas del día
-    all_dates = sorted(set(d for parameter in parameters_order for d in 
-                        [datetime.fromisoformat(ts) for ts in [item['timestamp'] for item in measurement_list[parameter]]]))
-    
-    day_ranges = {}
-    for d in all_dates:
-        key = d.date()
-        if key not in day_ranges:
-            day_ranges[key] = [d, d]
-        else:
-            if d < day_ranges[key][0]:
-                day_ranges[key][0] = d
-            if d > day_ranges[key][1]:
-                day_ranges[key][1] = d
-    midpoints = [start + (end-start)/2 for start, end in day_ranges.values()]
-
-    if len(day_ranges)>1:
-        ax2 = ax.secondary_xaxis('bottom')
-        ax2.xaxis.set_major_locator(FixedLocator([mdates.date2num(d) for d in midpoints]))
-        ax2.xaxis.set_major_formatter(mdates.DateFormatter('%d/%m/%Y'))
-        ax2.spines['bottom'].set_position(('outward', 40))
-        ax2.tick_params(axis='x', which='major', labelsize=10)
-
-    # Insertar unidades del parametro y título de la gráfica
-    ax.set_title(graph_title, fontsize=14, fontweight='bold', pad=20)
-    ax.set_ylabel(PARAMETERS_FOR_REPORT[parameter][0], fontsize=12, fontweight='bold')
-
-     # Etiqueta de color vs parametro
-    if len(parameters_order)>1: #Si hay mas de un solo parametro no se coloca etiqueta o título
-        ax.legend(loc='upper left', bbox_to_anchor=(1, 0.5), ncol=1, fontsize=10, frameon=True)
-    
-    # Grid para mejor lectura de la gráfica
-    ax.grid(True, which='both', color='lightgray', linestyle='--', linewidth=0.7, alpha=0.7)
-
-    plt.tight_layout()
-
-    fig.savefig(filename, dpi=300, bbox_inches='tight',transparent=True)
-    
-    # Mostrar gráfica
-    #plt.show()
-    
-    return fig
-
-async def main():
-    await chart_order(['V_all_1'],DATOS)
-
-if __name__ == "__main__":  
-    try:
-        asyncio.run(main())
-    except KeyboardInterrupt:
-        logger.info("KeyboardInterrupt: Shutting down service")
+M3_MAPPING={ # Mapeo de constantes de mensaje PV-M3
+    0:"serial_number",
+    1: "vA", 2: "vB", 3: "vC", #Voltajes de cada línea
+    4: "vAB", 5: "vBC", 6: "vCA", #Voltajes de cada fase
+    7: "iA", 8: "iB", 9: "iC", #Corrientes de cada línea
+    10: "PA", 11: "PB", 12: "PC", 13: "P", #Potencia Activa por línea y total
+    14: "QA", 15: "QB", 16: "QC", 17: "Q", #Potencia Reactiva por línea y total
+    18: "SA", 19: "SB", 20: "SC", 21: "S" , #Potencia Aparente por línea y total
+    22: "PFA",23: "PFB",24: "PFC",25: "PF", #Factor de Potencia por línea y total
+    26: "F", 27:"Signal_strength", #Frecuencia e intensidad de señal de transmisión
+    28: "P_kWh_T", #Indication value of total positive active energy
+    29: "R_kWh_T", #Indication value of total reverse active energy
+    30: "P_kvarh_T", #Indication value of total positive reactive energy
+    31: "R_kvarh_T", #Indication value of total reverse reactive energy
+    32: "P_Active_demand", ##Demanda de potencia activa positiva actual
+    33: "ICCID", #identificador único de placa
+    34: "PT", #Valor de transformador de potencia del medidor
+    35: "CT", #Valor de transformador de corriente del medidor (relación de transformación)
+    36: "TA", 37: "TB", 38: "TC", 39: "TN", #Temperaturas en líneas y neutro
+    40: "iF", #Corriente de fuga
+    41: "DI_status", #Estado de las entradas digitales (bit0:DI1,bit1:DI2,bit2:DI3,bit3:DI4)
+    42: "P_kWh_A", 43: "R_kWh_A", #Energía activa en A: Positiva e Inversa/Reversa
+    44: "P_kvarh_A", 45: "R_kvarh_A", #Energía reactiva en A: Positiva e Inversa/Reversa
+    46: "P_kWh_B", 47: "R_kWh_B", #Energía activa en B: Positiva e Inversa/Reversa
+    48: "P_kvarh_B", 49: "R_kvarh_B", #Energía reactiva en B: Positiva e Inversa/Reversa
+    50: "P_kWh_C", 51: "R_kWh_C", #Energía activa en C: Positiva e Inversa/Reversa
+    52: "P_kvarh_C", 53: "R_kvarh_C", #Energía reactiva en C: Positiva e Inversa/Reversa
+    54: "THD_A", 55: "THD_B", 56: "THD_C" , #Rate de harmonicos de voltaje por línea
+    57: "THDC_A",58: "THDC_B",59: "THDC_C", #Rate de harmonicos de corriente por línea
+    60: "R_Active_demand", #Demanda de potencia activa inversa actual
+    61: "P_Reactive_demand", #Demanda de potencia reactiva positiva actual
+    62: "R_Reactive_demand", #Demanda de potencia reactiva inversa actual
+    63: "V_unb", #Desbalance de voltaje en %
+    64: "I_unb", #Desbalance de corriente en %
+    65: "kWh_spike", #Energía total activa en "periodo spike"
+    66: "kWh_peak", #Energía total activa en "periodo peak"
+    67: "kWh_flat", #Energía total activa en "periodo flat"
+    68: "kWh_valley", #Energía total activa en "periodo valley"
+    69: "C1_kvarh", #Energía reactiva en 1er cuadrante
+    70: "C2_kvarh", #Energía reactiva en 2do cuadrante
+    71: "C3_kvarh", #Energía reactiva en 3er cuadrante
+    72: "C4_kvarh"  #Energía reactiva en 4to cuadrante 
+}

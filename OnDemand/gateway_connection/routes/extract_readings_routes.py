@@ -1,20 +1,13 @@
 #Rutas API para el funcionamiento y conexión del uS
 from OnDemand.gateway_connection.services.extract_readings_services import Displayable_measurements
-from AlwaysOn.uS_gateway.schemas import EventModel
 
-from fastapi import APIRouter, HTTPException, Query
-from typing import Optional,Any,Dict
-import json
-import logging
-import asyncio
-
+from fastapi import APIRouter, Query, Depends
+from sqlalchemy.ext.asyncio import AsyncSession
+from DB.database import get_db
 from datetime import datetime
 
-import logging 
-
-
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger('measure_route')
+import logging
+logger = logging.getLogger(__name__)
 
 router = APIRouter(
     prefix="/displayable",  #Rutas dedicadas a la evaluación de reglas
@@ -22,7 +15,13 @@ router = APIRouter(
 )
 
 @router.get("/extract_measures/")
-async def obtain_measures(meter_id:int, start_date:datetime,end_date:datetime):
-    measurements=await Displayable_measurements.get_measures(meter_id,start_date,end_date)
-    return measurements if measurements else None
+async def obtain_measures(meter_id:int, 
+                          start_date:datetime,
+                          end_date:datetime,
+                          session: AsyncSession = Depends(get_db)):
+    try:
+        measurements=await Displayable_measurements.get_measures(meter_id,start_date,end_date,session)
+        return measurements
+    except Exception:
+        logger.exception("Error while getting the displayable measurements")
     

@@ -1,12 +1,11 @@
 import asyncio
-import json
 from datetime import datetime
-import logging
+
 import httpx
 from typing import Optional,Any,Dict
 
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger('data_ext')
+import logging
+logger = logging.getLogger(__name__)
 
 PROJECT_ORDER="Proyecto_base"
 

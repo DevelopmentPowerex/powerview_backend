@@ -1,16 +1,15 @@
 import asyncio
-import logging
 from typing import Optional,Any,Dict,List
 
-from OnDemand.uS.get_details.date_info import report_info as get_dates
-from OnDemand.uS.get_details.project_info import project_data_extraction as get_project_and_fae
-from OnDemand.uS.get_details.measures_obtain import extract_all as extract_measures
-from OnDemand.uS.get_details.normal_graphs import chart_order as generate_individual_chart
-from OnDemand.uS.get_details.extract_events import extract_order as extract_events
+from OnDemand.uS.auxiliar.date_info import report_info as get_dates
+from OnDemand.uS.auxiliar.project_info import project_data_extraction as get_project_and_fae
+from OnDemand.uS.auxiliar.measures_obtain import extract_all as extract_measures
+from OnDemand.uS.auxiliar.normal_graphs import chart_order as generate_individual_chart
+from OnDemand.uS.auxiliar.extract_events import extract_order as extract_events
 from OnDemand.uS.generate_report.html_render import generate_html_report as generate_html
 
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger('report_order')
+import logging
+logger = logging.getLogger(__name__)
 
 PARAMETER_TRANSLATION={
     "vA":('V','Voltaje entre Fase A  y Neutro [vA]'),
@@ -437,7 +436,7 @@ async def report_gen(project_name:str,start_date:str,end_date:str): #Ingreso nom
     project_part, csv_1st , circuit_dict=await get_project_details(project_name) #DATOS DEL PROYECTO
     if not csv_1st:
         logger.error('Error while getting project details')
-
+        
     dates_part = await get_report_dates(start_date,end_date,csv_1st) #RANGO DE FECHAS Y CODIGO CSV
     if not dates_part:
         logger.error('Error while getting the date range')
@@ -449,6 +448,7 @@ async def report_gen(project_name:str,start_date:str,end_date:str): #Ingreso nom
     parameters_list=await translate_values(extreme_values) #FORMATEAR VALORES EXTREMOS PARA SU USO
     if not parameters_list:
         logger.error('Error while ordering the measurements')
+    
     """
     event_list,event_register=await get_events(circuit_dict,start_date,end_date) #EXTRAER EL REGISTRO DE EVENTOS 
     if not event_list:
@@ -457,6 +457,7 @@ async def report_gen(project_name:str,start_date:str,end_date:str): #Ingreso nom
     normal_graphs_list=await get_normal_graphs(measurements,start_date,end_date) #GENERAR LAS GRÁFICAS PARA EL REPORTE
     if not normal_graphs_list:
         logger.error('Error while generating the normal charts')
+    
     """
     event_graphs=await get_event_graphs(event_register) #GENERAR GRAFICAS ENFOCADAS EN MOSTRAR LOS EVENTOS ANTERIORES
     if not event_graphs:
@@ -464,6 +465,7 @@ async def report_gen(project_name:str,start_date:str,end_date:str): #Ingreso nom
     """
     event_graphs=[]
     event_list=[]
+
     new_report_order= await order_builder(project_part,circuit_dict,dates_part,parameters_list,normal_graphs_list,event_list,event_graphs)
     if not normal_graphs_list:
         logger.error('Error while generating the report order')

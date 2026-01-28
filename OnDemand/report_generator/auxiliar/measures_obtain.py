@@ -1,14 +1,13 @@
 import asyncio
-import json
 from datetime import datetime
-import logging
+
 import httpx
 from typing import Optional,Any,Dict,List
 
 from statistics import mean
 
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger('measure_extract')
+import logging
+logger = logging.getLogger(__name__)
 
 GATEWAY_URL = "http://127.0.0.1:8000/displayable"  # URL del endpoint del gateway interno
 

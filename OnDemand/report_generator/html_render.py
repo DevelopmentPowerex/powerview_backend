@@ -1,8 +1,7 @@
 from jinja2 import Environment, FileSystemLoader
-import logging
 
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger('report_render') 
+import logging
+logger = logging.getLogger(__name__)
 
 TEMPLATE_DIR = "uS/generate_report/static/templates/"
 OUTPUT_HTML = "uS/generate_report/result/editable_report.html"

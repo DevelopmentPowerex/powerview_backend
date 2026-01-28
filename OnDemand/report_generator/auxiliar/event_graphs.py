@@ -1,12 +1,12 @@
 import asyncio
 import json
 from datetime import datetime
-import logging
+
 import httpx
 from typing import Optional,Any,Dict,List
 
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger('events_graphs')
+import logging
+logger = logging.getLogger(__name__)
 
 GATEWAY_URL = "http://127.0.0.1:8000/displayable"
 
@@ -38,7 +38,6 @@ async def rule_details(rule_id:int,client:httpx.AsyncClient):
     if not response_data:
         logger.info(f'No details returned for rule: {rule_id}')    
         return None
-
 
 async def get_time_limits(event_low_limit:int,event_upper_limit:int,client:httpx.AsyncClient):
     response = await client.get(
