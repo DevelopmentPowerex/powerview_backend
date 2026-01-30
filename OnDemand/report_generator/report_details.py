@@ -42,7 +42,8 @@ async def fetch_report_data(client_name:str,
             logger.error('Error while obtaining the events/alarms register')
         
         return {
-            'report_values':extreme_values,
+            'circuits':circuits,
+            'report':extreme_values,
             'events':event_list,
             'readings':measurements
         }

@@ -18,15 +18,12 @@ from ..config import settings
 import logging
 logger = logging.getLogger(__name__)
 
-async def chart_order(graph_order:List[str],measurements_data=List[Dict[str,Any]])->Optional[str]:
+async def chart_order(graph_order:tuple,measurements_data=List[Dict[str,Any]])->Optional[str]:
 
     """
     graph_order: Str de nombre de la receta del gráfico. Ejm: 'V_all_1' grafica 'vA','vB','vC'
     
-    """
-    section_dict=measurements_data[0]
-    section_id=str(section_dict["meter_id"])
-
+    """    
     separator='_'
     parameters_to_plot=PREMADE_ORDERS[graph_order[0]][0] if graph_order[0] in PREMADE_ORDERS.keys() else graph_order
     data_dict = {}
@@ -51,7 +48,7 @@ async def chart_order(graph_order:List[str],measurements_data=List[Dict[str,Any]
     generated_chart=await create_line_chart(data_dict, parameters_to_plot, filename, graph_title)
 
     return order_file
-
+    
 async def create_line_chart(measurement_list:List[Dict[str,Any]], parameters_order:List[str], filename:str, graph_title:str,smooth_window=5):
     fig, ax = plt.subplots(figsize=(10, 4))
 

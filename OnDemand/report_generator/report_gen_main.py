@@ -128,11 +128,12 @@ async def report_gen(client_name:str,
         return None
     
     report_readings= await fetch_report_data(client_name,project_name,start_date,end_date)
-    logger.debug(report_readings['events'])
+    logger.debug(report_readings['report'])
     if not report_readings:
+        logger.error("Error fetching the project readings")
         return None
     
-    report_images=await generate_report_charts(report_readings)
+    report_images=await generate_report_charts(report_readings.get('circuits'),report_readings.get('readings'),report_readings.get('events'),start_date,end_date)
     if not report_images:
         return None
     """
