@@ -1,9 +1,18 @@
+from dotenv import load_dotenv
+load_dotenv("./OnDemand/report_generator/.env.local")
+
 import asyncio
 from typing import Optional,Any,Dict,List
 
+from OnDemand.report_generator.auxiliar.date_info import dates_info as get_report_dates
 from OnDemand.report_generator.report_details import fetch_report_data
 from OnDemand.report_generator.chart_generator import generate_report_charts
-from OnDemand.report_generator.html_render import generate_html_report as generate_html
+#from OnDemand.report_generator.html_render import generate_html_report as generate_html
+
+from .config import settings
+
+from .shared.logging_config import setup_logging
+setup_logging(settings.log_level)
 
 import logging
 logger = logging.getLogger(__name__)
@@ -112,14 +121,21 @@ async def report_gen(client_name:str,
                      start_date:str,
                      end_date:str): 
     
+    dates_part = await get_report_dates(start_date,end_date) #RANGO DE FECHAS Y CODIGO CSV
+    logger.debug(dates_part)
+    if not dates_part:
+        logger.error('Error while getting the date range')
+        return None
+    
     report_readings= await fetch_report_data(client_name,project_name,start_date,end_date)
+    logger.debug(report_readings['events'])
     if not report_readings:
         return None
     
     report_images=await generate_report_charts(report_readings)
     if not report_images:
         return None
-    
+    """
     new_report_order= await build_order(report_readings, report_images)
     if not new_report_order:
         logger.error('Error while generating the report order')
@@ -129,10 +145,11 @@ async def report_gen(client_name:str,
         logger.error('Error while rendering the html report')
     
     return []
-
+    """
+    
 
 async def main():
-    test_report=await report_gen('ELECTROPROTECCIONES SAS','Oficinas',"2026-01-27T17:48:00","2025-10-28T22:00:00")
+    test_report=await report_gen('ELECTROPROTECCIONES SAS','Proyecto A',"2026-01-19T17:48:00","2026-01-20T12:00:00")
 
 if __name__ == "__main__":  
 

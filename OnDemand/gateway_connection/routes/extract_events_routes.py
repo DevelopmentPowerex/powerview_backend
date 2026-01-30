@@ -18,7 +18,7 @@ router = APIRouter(
     tags=["EVENTS EXTRACTION"]    
 )
 
-@router.get("/extract_events/")
+@router.get("/extract_events")
 async def obtain_events(meter_list: List[int] = Query(...), 
                         start_date:datetime= Query(...),
                         end_date:datetime= Query(...),
@@ -30,7 +30,7 @@ async def obtain_events(meter_list: List[int] = Query(...),
         logger.exception(f"Error while getting the events between {start_date} and {end_date}")
         return None
     
-@router.get("/extract_rule_info/")
+@router.get("/extract_rule_info")
 async def obtain_rule_details(rule_id:int =Query(...),
                                session: AsyncSession = Depends(get_db)):
     try:
@@ -40,7 +40,7 @@ async def obtain_rule_details(rule_id:int =Query(...),
         logger.exception("Error while getting the rule details for the report")
         return None
     
-@router.get("/extract_triggers_ts/")
+@router.get("/extract_triggers_ts")
 async def obtain_triggers_ts(first_trigger:int= Query(...),
                             last_trigger:int= Query(...),
                             session: AsyncSession = Depends(get_db)):
@@ -51,13 +51,3 @@ async def obtain_triggers_ts(first_trigger:int= Query(...),
         logger.exception("Error getting the triggers timestamps")
         return None
 
-@router.get("/extract_circuit_name/")
-async def obtain_circuit_name(rule_id:int= Query(...),
-                            session: AsyncSession = Depends(get_db)):
-    try:
-        circuit_name=await Displayable_events.get_circuit_name(rule_id,session)
-        return circuit_name
-    except Exception:
-        logger.exception("Error while getting the circuits name for the report")
-        return None
-    

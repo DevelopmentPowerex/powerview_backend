@@ -30,7 +30,8 @@ PARAMETERS_FILTER=[# Parametros que se deben eliminar de la extracción por falt
     "C1_kvarh", #Energía reactiva en 1er cuadrante
     "C2_kvarh", #Energía reactiva en 2do cuadrante
     "C3_kvarh", #Energía reactiva en 3er cuadrante
-    "C4_kvarh"  #Energía reactiva en 4to cuadrante 
+    "C4_kvarh", #Energía reactiva en 4to cuadrante 
+    "TA","TB","TC","TN"
 ] 
 
 PARAMETERS_FOR_REPORT={
