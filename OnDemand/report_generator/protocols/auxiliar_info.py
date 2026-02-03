@@ -1,4 +1,8 @@
 
+
+TEMP_GEN_GRAPHS_PATH=r"C:\Users\jeras\Documents\PowerView\backend_pv\OnDemand\report_generator\temp\gen_graphs"
+GRAPH_PATH='/OnDemand/report_generator/temp/gen_graphs'
+
 PREMADE_ORDERS={
     "V_all_1":(['vA','vB','vC'],'chart_voltage_PN'),
     "V_all_2":(['vAB','vBC','vCA'],'chart_voltage_PP'),

@@ -24,7 +24,7 @@ async def extract_measures(meter_id:List,start_date:datetime,end_date:datetime,c
 
         response.raise_for_status()
         response_data=response.json()
-
+        
         if not response_data:
             logger.error(f'No measures returned for meter: {meter_id}')    
             return None
@@ -35,26 +35,24 @@ async def extract_measures(meter_id:List,start_date:datetime,end_date:datetime,c
         logger.exception(f"Something went wrong while asking for the measure register")
 
 async def translate_values(extreme_values:Dict[str,Any]): 
-    formatted_extremes={}
+    
     report_extremes=[]
     for circuit in extreme_values:
+        formatted_extremes={}
+
         for report_parameter in PREMADE_ORDERS.keys():
             new_param_values=[]
+
             for parameter in PREMADE_ORDERS[report_parameter][0]:
                 if not(circuit['extreme_values'][parameter]['max'] == 0 and circuit['extreme_values'][parameter]['min'] ==0 and circuit['extreme_values'][parameter]['prom'] == 0):
-                    item={
+                    new_param_values.append({
                         'name':parameter,
                         'max':circuit['extreme_values'][parameter]['max'],
                         'min':circuit['extreme_values'][parameter]['min'],
                         'prom':circuit['extreme_values'][parameter]['prom']
-                    }
-                    
-                    new_param_values.append(item)
-            
+                    })
             if new_param_values:
-                formatted_extremes.update({
-                    report_parameter:new_param_values
-                })
+                formatted_extremes[report_parameter] = new_param_values
             
         report_extremes.append({
             'meter_id':circuit['meter'],
@@ -62,6 +60,7 @@ async def translate_values(extreme_values:Dict[str,Any]):
             'end_time':circuit['end'],
             'extreme_values':formatted_extremes,
         })
+    
     return report_extremes
 
 async def calculate_extreme(meter_list:List[int],measurement_list:List[Dict[str,Any]])->Optional[Dict[str,Any]]:

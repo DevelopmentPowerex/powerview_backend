@@ -67,7 +67,7 @@ class Displayable_measurements:
             
             result_measurements = await session.execute(stmt_measures)
             measures = result_measurements.mappings().all()
-
+            
             return measures if measures else None
 
         except Exception:

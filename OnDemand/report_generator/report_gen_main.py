@@ -21,19 +21,18 @@ TEMPLATE_DIR = "OnDemand/uS/generate_report/static/templates/"
 
 OUTPUT_HTML = "OnDemand/uS/generate_report/result/editable_report.html"
 
-async def build_order(circuit_list,dates_part,parameters_list,normal_graphs,events_table,events_graphs): #Formar la orden JSON para el renderizador de la plantilla HTML
-    
+async def build_order(client_name:str,project_name:str,dates_part:Dict[str,Any],circuits_per_project, readings_for_report, events_for_report,charts_for_report): #Formar la orden JSON para el renderizador de la plantilla HTML
     """
     report_data = {
         "report_info":{
-            "gen_date": "11/09/2025",
-            "date_range_start": "01/08/2025",
-            "date_range_end": "31/08/2025",
-            "csv_code":"Indurama_0108_3108"
+            "gen_date": dates_part.get('gen_date'),
+            "date_range_start": dates_part.get('date_range_start'),
+            "date_range_end": dates_part.get('date_range_end'),
+            "csv_code":f"{client_name.lower().replace(" ","")}_{project_name.lower()}{dates_part['csv']}"
         },
         "project_info":{
-            "client_name": "INDURAMA ECUADOR S.A.",
-            "project_name": "Laboratorios RI",
+            "client_name":client_name,
+            "project_name": project_name,
             "fae": {
                 "company_name":"PREMIUMENERGIA SAS",
                 "engineer_name":"Ing. Jeramhil Javier Solis Yari",
@@ -66,54 +65,84 @@ async def build_order(circuit_list,dates_part,parameters_list,normal_graphs,even
                 ]
             }
         ],
-        "events":{
-            "table_info":[
-                {
-                "broken_rule":"iA>0",
-                "first_event":"08:30",
-                "last_event":"12:52",
-                "event_counter":"20"
-                },
-                {
-                "broken_rule":"VA=0",
-                "first_event":"22:00",
-                "last_event":"23:20",
-                "event_counter":"30"
-                }
-            ],
-            "events_images":[
-                {
-                "name": "Alarma 1",
-                "image": "/public_access/uS_public_service/generate_report/static/img/grafica.jpg"
-                },
-                {
-                "name": "Alarma 2",
-                "image":"/public_access/uS_public_service/generate_report/static/img/grafica.jpg"
-                }
-            ]
-        }
+        "events":[
+            {
+            "broken_rule":"iA>0",
+            "first_event":"08:30",
+            "last_event":"12:52",
+            "event_counter":"20"
+            },
+            {
+            "broken_rule":"VA=0",
+            "first_event":"22:00",
+            "last_event":"23:20",
+            "event_counter":"30"
+            }
+        ]
     }
     """
-    circuits_estructure=[]
+    dates_part["csv"]=client_name.replace(" ","_").lower()+"_"+project_name.lower().replace(" ","_")+dates_part["csv"]
+ 
+    models_list=[]
+    
+    clear_data_list=[]
+    for circuit in circuits_per_project:
+        
+        models_list.append(circuit['model_name'])
+        circuits_estructure=[]
+        for data_set in readings_for_report:
+            if data_set['meter_id']==circuit['id']:
+                circuits_estructure.append({
+                    "name": circuit['nickname'],
+                    "parameters_list":data_set['extreme_values'],
+                    "behaviour_images": charts_for_report.get(circuit['id'],[])
+                })
+        
+        clear_data_list.append(circuits_estructure)
+    
+    new_events_list=[]
+    for event in events_for_report:
+        #Mayor numero, mayor gravedad
+        match event.get('level'):
+            case 1:
+                new_level="LOW"
+            case 2:
+                new_level="MID"
+            case 3:
+                new_level="CRITICAL"
+            case _:
+                new_level="LOW"
 
-    for index,key in enumerate(circuit_list):
-        circuits_estructure.append({
-                "name": circuit_list[key],
-                "parameters_list": parameters_list[index]['extreme_values'],
-                "behaviour_images": normal_graphs[index]['behaviour_images']
-            })
-                
+        new_events_list.append({
+            "circuit":event.get('circuit'),
+            "context":event.get('context'),
+            "rule":event.get('parameter')+event.get('comparator')+str(event.get('threshold')),
+            "level":new_level,
+            "first_event":event.get('1st_ts'),
+            "last_event":event.get('last_ts'),
+            "event_counter":event.get('event_counter')
+        })
+
+        
+    project_info={
+        "client_name":client_name,
+        "project_name": project_name,
+        "fae": {
+            "company_name":"PREMIUMENERGIA SAS",
+            "engineer_name":"Ing. Jeramhil Javier Solis Yari",
+            "email_addr":"proyectos@premium-energia.com",
+            "phone":"0984373697"
+        },
+        "meters_list": list(dict.fromkeys(models_list)),
+    }
+
     report_data = {
         "report_info":dates_part,
-        "circuits_list": circuits_estructure,
-        "events":{
-            "table_info":events_table,
-            "events_images":events_graphs
-        }
+        "project_info":project_info,
+        "circuits_list": clear_data_list,
+        "events":new_events_list
     }
-    
-    #logger.info(report_data)
-    
+     
     return report_data
 
 async def report_gen(client_name:str,
@@ -133,14 +162,18 @@ async def report_gen(client_name:str,
         logger.error("Error fetching the project readings")
         return None
     
-    report_images=await generate_report_charts(report_readings.get('circuits'),report_readings.get('readings'),report_readings.get('events'),start_date,end_date)
-    if not report_images:
+    charts_for_report=await generate_report_charts(report_readings.get('circuits'),report_readings.get('readings'),start_date,end_date)
+    logger.debug(charts_for_report)
+    if not charts_for_report:
         return None
-    """
-    new_report_order= await build_order(report_readings, report_images)
+    
+    new_report_order= await build_order(client_name,project_name,dates_part, report_readings.get('circuits'), report_readings.get('report'),report_readings.get('events'), charts_for_report)
+    logger.info(new_report_order)
     if not new_report_order:
         logger.error('Error while generating the report order')
-
+        return None
+    
+    """
     html_report= await generate_html(TEMPLATE_DIR, OUTPUT_HTML, new_report_order)
     if not html_report:
         logger.error('Error while rendering the html report')
