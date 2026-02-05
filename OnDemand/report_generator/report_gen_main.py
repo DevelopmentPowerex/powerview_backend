@@ -7,7 +7,7 @@ from typing import Optional,Any,Dict,List
 from OnDemand.report_generator.auxiliar.date_info import dates_info as get_report_dates
 from OnDemand.report_generator.report_details import fetch_report_data
 from OnDemand.report_generator.chart_generator import generate_report_charts
-#from OnDemand.report_generator.html_render import generate_html_report as generate_html
+from OnDemand.report_generator.html_render import generate_html_report as generate_html
 
 from .config import settings
 
@@ -17,89 +17,29 @@ setup_logging(settings.log_level)
 import logging
 logger = logging.getLogger(__name__)
 
-TEMPLATE_DIR = "OnDemand/uS/generate_report/static/templates/"
+TEMPLATE_DIR = "OnDemand/report_generator/static/templates/"
 
-OUTPUT_HTML = "OnDemand/uS/generate_report/result/editable_report.html"
+OUTPUT_HTML = "OnDemand/report_generator/result/editable_report.html"
 
 async def build_order(client_name:str,project_name:str,dates_part:Dict[str,Any],circuits_per_project, readings_for_report, events_for_report,charts_for_report): #Formar la orden JSON para el renderizador de la plantilla HTML
-    """
-    report_data = {
-        "report_info":{
-            "gen_date": dates_part.get('gen_date'),
-            "date_range_start": dates_part.get('date_range_start'),
-            "date_range_end": dates_part.get('date_range_end'),
-            "csv_code":f"{client_name.lower().replace(" ","")}_{project_name.lower()}{dates_part['csv']}"
-        },
-        "project_info":{
-            "client_name":client_name,
-            "project_name": project_name,
-            "fae": {
-                "company_name":"PREMIUMENERGIA SAS",
-                "engineer_name":"Ing. Jeramhil Javier Solis Yari",
-                "email_addr":"proyectos@premium-energia.com",
-                "phone":"0984373697"
-            },
-            "meters_list": ['PV-M3'],
-        },
-        "circuits_list": [
-            {
-                "name": "Alimentación Laboratorio 7",
-                "parameters_list": [
-                    {
-                        "name": "FRECUENCIA [Hz]",
-                        "param_values": [
-                            {"name": "F", "max": 60.23, "min": 59.88, "prom": 59.98}
-                        ]
-                    }
-                ],
-                
-                "behaviour_images": [
-                    {
-                    "name": "Voltajes por línea [V]",
-                    "image": "/public_access/uS_public_service/generate_report/static/img/v1.png"
-                    },
-                    {
-                    "name": "Corrientes por línea [A]",
-                    "image":"/public_access/uS_public_service/generate_report/static/img/i2.png"
-                    }
-                ]
-            }
-        ],
-        "events":[
-            {
-            "broken_rule":"iA>0",
-            "first_event":"08:30",
-            "last_event":"12:52",
-            "event_counter":"20"
-            },
-            {
-            "broken_rule":"VA=0",
-            "first_event":"22:00",
-            "last_event":"23:20",
-            "event_counter":"30"
-            }
-        ]
-    }
-    """
+    
     dates_part["csv"]=client_name.replace(" ","_").lower()+"_"+project_name.lower().replace(" ","_")+dates_part["csv"]
  
     models_list=[]
-    
     clear_data_list=[]
     for circuit in circuits_per_project:
         
         models_list.append(circuit['model_name'])
-        circuits_estructure=[]
+        
         for data_set in readings_for_report:
             if data_set['meter_id']==circuit['id']:
-                circuits_estructure.append({
+                clear_data_list.append({
                     "name": circuit['nickname'],
                     "parameters_list":data_set['extreme_values'],
                     "behaviour_images": charts_for_report.get(circuit['id'],[])
                 })
+                break
         
-        clear_data_list.append(circuits_estructure)
-    
     new_events_list=[]
     for event in events_for_report:
         #Mayor numero, mayor gravedad
@@ -173,13 +113,13 @@ async def report_gen(client_name:str,
         logger.error('Error while generating the report order')
         return None
     
-    """
+    
     html_report= await generate_html(TEMPLATE_DIR, OUTPUT_HTML, new_report_order)
     if not html_report:
         logger.error('Error while rendering the html report')
     
     return []
-    """
+    
     
 
 async def main():

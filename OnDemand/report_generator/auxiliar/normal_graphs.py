@@ -28,25 +28,25 @@ async def chart_order(charts_data:List[Dict[str,Any]])->Optional[str]:
             logger.debug(parameters_to_plot)
             file_code=f'\meter{circuit["meter_id"]}_{PREMADE_ORDERS[chart_name][1]}' if chart_name in PREMADE_ORDERS.keys() else f'\meter{(circuit["meter_id"])}chart_{separator.join(chart_name)}'
             logger.debug(file_code)
-            graph_title=chart_name if chart_name in PREMADE_ORDERS.keys() else separator.join(chart_name)
+            graph_title=PARAMETERS_FOR_REPORT[chart_name][1] if chart_name in PREMADE_ORDERS.keys() else separator.join(chart_name)
             logger.debug(graph_title)
             filename= TEMP_GEN_GRAPHS_PATH+file_code
             logger.debug(filename)
             order_file=GRAPH_PATH+file_code+'.png'
             logger.debug(order_file)
 
-            generated_chart=await create_line_chart(circuit["graphs"][chart_name], parameters_to_plot, filename, graph_title)
+            generated_chart=await create_line_chart(circuit["graphs"][chart_name], parameters_to_plot, filename, order_file,graph_title)
             
             if not generated_chart:
                 logger.error(f"Error generating charts for order {chart_name}")
                 continue
             
-            generated_chart_list.append(generated_chart)
+            generated_chart_list.append({"name":graph_title,"image":generated_chart})
         circuits_n_charts[circuit["meter_id"]]=generated_chart_list
 
     return circuits_n_charts if circuits_n_charts else None 
     
-async def create_line_chart(measurement_list:List[Dict[str,Any]], parameters_order:List[str], filename:str, graph_title:str,smooth_window=5):
+async def create_line_chart(measurement_list:List[Dict[str,Any]], parameters_order:List[str], filename:str,order_file:str,graph_title:str,smooth_window=5):
     fig, ax = plt.subplots(figsize=(10, 4))
 
     line_colors = ["#0b4b79", '#ff7f0e', "#39a02c", '#d62728', '#9467bd', 
@@ -145,10 +145,11 @@ async def create_line_chart(measurement_list:List[Dict[str,Any]], parameters_ord
         
         plt.close(fig)
 
-        return filename if fig else None
+        return order_file if fig else None
     
     except Exception:
         logger.exception("Error generating report charts")
+        return None
 
 async def main():
     await chart_order(['V_all_1'],DATOS_PRUEBA)

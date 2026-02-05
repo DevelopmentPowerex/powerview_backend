@@ -108,7 +108,7 @@
     <!-- HEADER -->
     <header class="header flex justify-between items-center border-b border-slate-200 px-8 py-3 bg-white">
     <div class="flex items-center">
-        <img src="/OD_service/uS/generate_report/static/img/loguito.png" 
+        <img src="/OnDemand/report_generator/static/img/loguito.png" 
             alt="PowerView" class="h-6 mr-3">
         <p>Proyecto: <span class="text-md font-semibold"> {{project_info.project_name}}</span></p>
         
@@ -146,7 +146,7 @@
             </div>
             <div class="p-4 rounded-sm border border-slate-200">
                 <p class="text-xs uppercase tracking-wider text-slate-500">Medidores utilizados</p>
-                {% for meter in project_info.meter_models %}
+                {% for meter in project_info.meters_list %}
                     <p class="font-medium">{{meter}}</p>
                 {%endfor%}
             </div>
@@ -157,7 +157,7 @@
         </div>
         
         <div class="flex justify-center gap-12">
-            <img src="/OD_service/uS/generate_report/static/img/logo_powerview.png" alt="POWEREX" class="w-full h-auto max-h-20 object-contain"/>
+            <img src="/OnDemand/report_generator/static/img/logo_powerview.png" alt="POWEREX" class="w-full h-auto max-h-20 object-contain"/>
         </div>
     </div>
 
@@ -217,7 +217,7 @@
         <section> <!-- GRAFICAS COMPORTAMIENTO -->
             <h2 class="text-2xl font-bold text-slate-900 mt-4">2. Gráficas de comportamiento</h2>
             <p class="mt-4 text-slate-700 leading-relaxed text-sm">
-            En las siguientes gráficas se puede revisar el comportamiento que han tenido los parámetros básicos de voltaje y corriente, para cada uno de los circuitos del proyecto
+            En las siguientes gráficas se puede revisar el comportamiento que han tenido los parámetros eléctricos de los circuitos monitoreados de {{project_info.project_name}}
             </p>  
             
             {% for circuit in circuits_list %}
@@ -229,7 +229,7 @@
                             <div class="grid-item p-4 rounded-sm ring-1 ring-slate-200">
                                 <p class="text-xs uppercase tracking-wider text-slate-500 mt-4">{{graph.name}}</p>
                                 <p class="mt-1 text-3xl font-extrabold">———</p>
-                                <img src="{{graph.image}}" alt="{{ graph.name }}" class="w-full h-auto max-h-auto object-contain"/>
+                                <img src="{{graph.image}}" alt="{{graph.name}}" class="w-full h-auto max-h-auto object-contain"/>
                             </div> 
                         {% endfor %}
                     </div>
@@ -242,13 +242,18 @@
    
         <section> <!-- TABLA ALARMAS -->
             <h2 class="mt-4 text-2xl font-bold text-slate-900">3. Alarmas ocurridas</h2>
-            {% if events.table_info %}
+            <p class="mt-4 text-sm text-slate-600">
+                En caso de haberse presentado alguna eventualidad, esta fue notificada oportunamente a 
+                través del sistema automatizado de monitoreo. El registro de los eventos ocurridos es el siguiente.
+            </p>
+            {% if events %}
                 <div class="mt-4 overflow-hidden rounded-sm ring-1 ring-slate-200">   
                     <table class="w-full border-collapse text-sm text-center">
                         <thead class="bg-slate-50">
                             <tr>
                                 <th class="font-semibold p-3">#</th>
                                 <th class="font-semibold p-3">Circuito</th>
+                                <th class="font-semibold p-3">Contexto</th>
                                 <th class="font-semibold p-3">Regla rota</th>
                                 <th class="font-semibold p-3">Primer evento</th>
                                 <th class="font-semibold p-3">Último evento</th>
@@ -257,21 +262,22 @@
                             </tr>
                         </thead>
                     <tbody>
-                        {%for event in events.table_info%}
+                        {%for event in events%}
                             <tr>
             
                                 <td class="p-3">{{loop.index}}</td>
                                 <td class="p-3">{{event.circuit}}</td>
-                                <td class="p-3">{{event.broken_rule}}</td>
-                                <td class="p-3">{{event.first_event}}</td>
-                                <td class="p-3">{{event.last_event}}</td>
+                                <td class="p-3">{{event.context}}</td>
+                                <td class="p-3">{{event.rule}}</td>
+                                <td class="p-3">{{event.first_event| replace("T", " ")}}</td>
+                                <td class="p-3">{{event.last_event| replace("T", " ")}}</td>
                                 <td class="p-3">{{event.event_counter}}</td>
-                                {%if event.alarm_level == "Alta"%}
-                                    <td class="bg-red-600 p-3">{{event.alarm_level}}</td>
-                                {%elif event.alarm_level == "Media"%}  
-                                    <td class="bg-orange-500 p-3">{{event.alarm_level}}</td>
-                                {%elif event.alarm_level == "Baja"%}  
-                                    <td class="bg-yellow-300 p-3">{{event.alarm_level}}</td>
+                                {%if event.level == "CRITICAL"%}
+                                    <td class="bg-red-600 p-3">CRITICA</td>
+                                {%elif event.level == "MID"%}  
+                                    <td class="bg-orange-500 p-3">MEDIA</td>
+                                {%elif event.level == "LOW"%}  
+                                    <td class="bg-yellow-300 p-3">BAJA</td>
                                 {%endif%}
                                 
                             </tr>
@@ -284,35 +290,15 @@
             {%endif%}
         </section>
        
-        <section> <!-- GRAFICAS ALARMAS -->
-            <h2 class="mt-4 text-2xl font-bold text-slate-900 ">4. Comportamientos anormales</h2>
-            <p class="mt-4 text-sm text-slate-600">
-                En caso de haberse presentado alguna eventualidad, esta fue notificada oportunamente a 
-                través del sistema automatizado de monitoreo. El comportamiento de los parámetros eléctricos asociados a dicho evento se muestra en las siguientes gráficas.
-            </p>
-            {% if events.events_images %}
-
-                {% for graph in events.events_images %}
-                <div class="mt-6 p-4 border border-slate-200 rounded-sm">
-                    <p class="text-xs uppercase tracking-wider text-slate-500 mt-4">{{graph.name}}</p>
-                    <p class="mt-1 text-3xl font-extrabold">———</p>
-                    <img src="{{graph.image}}" alt="{{graph.name}}" class="mt-3 w-full">
-                </div>
-                {% endfor %}
-            {% else %}
-                <p class="mt-4 text-slate-500 italic">No se detectaron comportamientos anormales en el periodo.</p>
-            {% endif %}
-        </section>
-         
         <div class="page-break"></div>
         <section><!-- ANEXOS Y CIERRE -->
             <h2 class="mt-4 text-2xl font-bold text-slate-900">5. Anexos</h2>
             <p class="mt-4 text-sm text-slate-600">En los siguientes archivos podrá encontrar la información completa que fue resumida en este informe.</p>
             <ul class="mt-4 list-disc pl-6 text-slate-700 text-sm">
-                <li>Registro completo de las mediciones (<a href="\Indurama_001_0825_M3.zip">{{report_info.csv_code}}.csv</a>).</li>
+                <li>Registro completo de las mediciones: {{report_info.csv}}.csv</li>
                 
-                {%if events.table_info%}
-                <li>Registro de alarmas emitidas (<a href="\Indurama_001_0825_M3.zip"></a>{{report_info.csv_code}}_alarmas.csv).</li>
+                {%if events%}
+                <li>Registro de alarmas emitidas: {{report_info.csv}}_eventos.csv</li>
                 {%endif%}
 
             </ul><!-- Mensaje final -->
