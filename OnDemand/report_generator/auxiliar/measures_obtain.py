@@ -7,7 +7,7 @@ from typing import Optional,Any,Dict,List
 from statistics import mean
 
 from ..config import settings
-from ..protocols.auxiliar_info import PARAMETERS_FILTER, PREMADE_ORDERS
+from ..protocols.auxiliar_info import PARAMETERS_FILTER, PREMADE_ORDERS,PARAMETERS_FOR_REPORT
 from ..protocols.endpoints import EXTRACT_MEASURES_ENDPOINT
 import logging
 logger = logging.getLogger(__name__)
@@ -52,7 +52,7 @@ async def translate_values(extreme_values:Dict[str,Any]):
                         'prom':circuit['extreme_values'][parameter]['prom']
                     })
             if new_param_values:
-                formatted_extremes[report_parameter] = new_param_values
+                formatted_extremes[PARAMETERS_FOR_REPORT[report_parameter][1]]= new_param_values
             
         report_extremes.append({
             'meter_id':circuit['meter'],

@@ -1,7 +1,7 @@
 
 
 TEMP_GEN_GRAPHS_PATH=r"C:\Users\jeras\Documents\PowerView\backend_pv\OnDemand\report_generator\temp\gen_graphs"
-GRAPH_PATH='/OnDemand/report_generator/temp/gen_graphs'
+GRAPH_PATH=r'\temp\gen_graphs'
 
 PREMADE_ORDERS={
     "V_all_1":(['vA','vB','vC'],'chart_voltage_PN'),
@@ -39,66 +39,66 @@ PARAMETERS_FILTER=[# Parametros que se deben eliminar de la extracción por falt
 ] 
 
 PARAMETERS_FOR_REPORT={
-    "V_all_1":('V','VOLTAJES FASE NEUTRO'),
+    "V_all_1":('V','VOLTAJES FASE NEUTRO [V]'),
     "vA":('V','Voltaje entre Fase A  y Neutro [vA]'),
     "vB":('V','Voltaje entre Fase B  y Neutro [vB]'),
     "vC":('V','Voltaje entre Fase C  y Neutro [vC]'),
 
-    "V_all_2":('V','VOLTAJES FASE FASE'),
+    "V_all_2":('V','VOLTAJES FASE FASE [V]'),
     "vAB":('V','Voltaje entre Fases  A y B [vAB]'),
     "vBC":('V','Voltaje entre Fases  B y C [vBC]'),
     "vCA":('V','Voltaje entre Fases  C y A [vCA]'),
 
-    "I_all":('A','CORRIENTES POR FASE'),
+    "I_all":('A','CORRIENTES POR FASE [A]'),
     "iA":('A','Corriente en Fase A [iA]'),
     "iB":('A','Corriente en Fase B [iB]'),
     "iC":('A','Corriente en Fase C [iC]'), 
 
-    "P_all":('kW','POTENCIA ACTIVA POR FASE'),
+    "P_all":('kW','POTENCIA ACTIVA POR FASE [kW]'),
     "PA":('kW','Potencia Activa en Fase A [PA]'),
     "PB":('kW','Potencia Activa en Fase B [PB]'), 
     "PC":('kW','Potencia Activa en Fase C [PC]'),
     "P":('kW','Potencia Activa Total [P]'),
 
-    "Q_all":('kVAR','POTENCIA REACTIVA POR FASE'),
+    "Q_all":('kVAR','POTENCIA REACTIVA POR FASE [kVAR]'),
     "QA":('kVAR','Potencia Reactiva en Fase A [QA]'), 
     "QB":('kVAR','Potencia Reactiva en Fase B [QB]'),
     "QC":('kVAR','Potencia Reactiva en Fase C [QC]'),
     "Q":('kVAR','Potencia Reactiva Total [Q]'),
 
-    "S_all":('kVA','POTENCIA APARENTE POR FASE'),
+    "S_all":('kVA','POTENCIA APARENTE POR FASE [kVA]'),
     "SA":('kVA','Potencia Aparente en Fase A [SA]'),
     "SB":('kVA','Potencia Aparente en Fase B [SB]'), 
     "SC":('kVA','Potencia Aparente en Fase C [SC]'), 
     "S" :('kVA','Potencia Aparente Total [S]'),
 
-    "Wh_all_p":('kWh','ENERGIA ACTIVA POSITIVA POR FASE'),
+    "Wh_all_p":('kWh','ENERGIA ACTIVA POSITIVA POR FASE [kWh]'),
     "P_kWh_A":('kWh','Energía activa en Fase A: Positiva'),
     "P_kWh_B":('kWh','Energía activa en Fase B: Positiva'),
     "P_kWh_C":('kWh','Energía activa en Fase C: Positiva'),
     "P_kWh_T":('kWh','Energía Activa Positiva Total') ,
 
-    "Wh_all_r":('kWh','ENERGIA ACTIVA INVERSA POR FASE'),
+    "Wh_all_r":('kWh','ENERGIA ACTIVA INVERSA POR FASE [kWh]'),
     "R_kWh_A":('kWh','Energía activa en Fase A: Inversa'),
     "R_kWh_B":('kWh','Energía activa en Fase B: Inversa'),
     "R_kWh_C":('kWh','Energía activa en Fase C: Inversa'),
     "R_kWh_T":('kWh','Energía Activa Inversa Total'),
 
-    "varh_all_p":('kWh','ENERGIA REACTIVA POSITIVA POR FASE'),
+    "varh_all_p":('kVarh','ENERGIA REACTIVA POSITIVA POR FASE [kVarh]'),
     "P_kvarh_A":('kVarh','Energía reactiva en Fase A: Positiva'),
     "P_kvarh_B":('kVarh','Energía reactiva en Fase B: Positiva'),
     "P_kvarh_C":('kVarh','Energía reactiva en Fase C: Positiva'),
     "P_kvarh_T":('kVarh','Energía Reactiva Positiva Total'),
 
-    "varh_all_r":('kWh','ENERGIA REACTIVA INVERSA POR FASE'),
+    "varh_all_r":('kVarh','ENERGIA REACTIVA INVERSA POR FASE [kVarh]'),
     "R_kvarh_A":('kVarh','Energía reactiva en Fase A: Inversa'),
     "R_kvarh_B":('kVarh','Energía reactiva en Fase B: Inversa'),
     "R_kvarh_C":('kVarh','Energía reactiva en Fase C: Inversa'),
     "R_kvarh_T":('kVarh','Energía Reactiva Inversa Total'),
 
-    "PF":('','Factor de Potencia [PF]'),
-    "F":('Hz','Frecuencia [F]'), 
-    "iF":('A','Corriente de Fuga [iF]'),
+    "PF":('','Factor de Potencia'),
+    "F":('Hz','Frecuencia [Hz]'), 
+    "iF":('A','Corriente de Fuga [A]'),
  
 }
 

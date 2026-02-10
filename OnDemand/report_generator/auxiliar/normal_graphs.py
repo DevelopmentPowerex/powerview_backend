@@ -26,13 +26,16 @@ async def chart_order(charts_data:List[Dict[str,Any]])->Optional[str]:
             
             #for parameter in parameters_to_plot:
             logger.debug(parameters_to_plot)
-            file_code=f'\meter{circuit["meter_id"]}_{PREMADE_ORDERS[chart_name][1]}' if chart_name in PREMADE_ORDERS.keys() else f'\meter{(circuit["meter_id"])}chart_{separator.join(chart_name)}'
-            logger.debug(file_code)
+            
             graph_title=PARAMETERS_FOR_REPORT[chart_name][1] if chart_name in PREMADE_ORDERS.keys() else separator.join(chart_name)
             logger.debug(graph_title)
+
+            file_code=f'\meter{circuit["meter_id"]}_{PREMADE_ORDERS[chart_name][1]}' if chart_name in PREMADE_ORDERS.keys() else f'\meter{(circuit["meter_id"])}chart_{separator.join(chart_name)}'
+            logger.debug(file_code)
             filename= TEMP_GEN_GRAPHS_PATH+file_code
             logger.debug(filename)
-            order_file=GRAPH_PATH+file_code+'.png'
+            
+            order_file=filename+'.png'
             logger.debug(order_file)
 
             generated_chart=await create_line_chart(circuit["graphs"][chart_name], parameters_to_plot, filename, order_file,graph_title)

@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Informe Periódico | PowerView</title>
+
+    <!-- Tailwind CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#eef7ff',
+                            100: '#d9ecff',
+                            200: '#aedaff',
+                            300: '#7cc2ff',
+                            400: '#4aa6ff',
+                            500: '#1f86ff',
+                            600: '#1068db',
+                            700: '#0b50ad',
+                            800: '#0a3e85',
+                            900: '#082f66'
+                        }
+                    },
+                    fontFamily: {
+                        sans: [
+                        "Inter",
+                        "ui-sans-serif",
+                        "system-ui",
+                        "Segoe UI",
+                        "Roboto",
+                        "Helvetica",
+                        "Arial",
+                        "Noto Sans",
+                        "Apple Color Emoji",
+                        "Segoe UI Emoji"
+                        ]
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+    /* ==============================
+    CONFIGURACIÓN DE IMPRESIÓN
+    ============================== */
+    @page { size: A4; margin: 0; }
+
+    @media print {
+    html, body {
+    margin: 0;
+    padding: 0;
+    background: white !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    }
+
+    :root { --page-pad-x: 16mm; }
+
+    /* ---------- PORTADA ---------- */
+    .cover {
+    min-height: 297mm;
+    padding: 20mm var(--page-pad-x);
+    break-after: page;
+    }
+
+    /* Tablas limpias */
+    thead { display: table-header-group; }
+    tfoot { display: table-footer-group; }
+    tr { break-inside: avoid; }
+
+    /* Quitar estilos de pantalla */
+    .container {
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+    }
+    }
+
+    /* ==============================
+    VISUALIZACIÓN EN PANTALLA
+    ============================== */
+    @media screen {
+    body {
+    background-color: #f3f4f6;
+    padding: 20px;
+    }
+
+    .container {
+    max-width: 210mm;
+    margin: 0 auto;
+    background: white;
+    padding: 20mm;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+    }
+    }
+
+
+    /* ==============================
+    ESTILOS BASE
+    ============================== */
+    body {
+    font-family: "Inter", sans-serif;
+    color: #1e293b;
+    }
+    </style>
+</head>
+
+<body>
+    <!-- PORTADA REPORTE-->
+    <div class="cover flex flex-col items-center justify-center">
+        <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight text-slate-900 text-center mt-6">
+            INFORME PERIÓDICO
+        </h1>
+
+        <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight text-slate-900 text-center mt-6">
+            {{ project_info.project_name }}
+        </h1>
+
+        <p class="mt-4 text-lg text-slate-600 text-center mb-10">
+            Detalles del sistema eléctrico monitoreado por PowerView
+        </p>
+
+        <div class="mt-10 grid grid-cols-3 md:grid-cols-3 gap-4 mb-12">
+        <div class="p-4 rounded-sm border border-slate-200">
+            <p class="text-xs uppercase tracking-wider text-slate-500">Cliente</p>
+            <p class="font-medium">{{ project_info.client_name }}</p>
+        </div>
+
+        <div class="p-4 rounded-sm border border-slate-200">
+            <p class="text-xs uppercase tracking-wider text-slate-500">Proyecto</p>
+            <p class="font-medium">{{ project_info.project_name }}</p>
+        </div>
+
+        <div class="p-4 rounded-sm border border-slate-200">
+            <p class="text-xs uppercase tracking-wider text-slate-500">Circuitos</p>
+            {% for circuit in circuits_list %}
+            <p class="font-medium">{{ circuit.name }}</p>
+            {% endfor %}
+        </div>
+
+        <div class="p-4 rounded-sm border border-slate-200">
+            <p class="text-xs uppercase tracking-wider text-slate-500">Rango de fechas</p>
+            <p class="font-medium">{{ report_info.date_range_start }}</p>
+            <p class="font-medium">{{ report_info.date_range_end }}</p>
+        </div>
+
+        <div class="p-4 rounded-sm border border-slate-200">
+            <p class="text-xs uppercase tracking-wider text-slate-500">Medidores utilizados</p>
+            {% for meter in project_info.meters_list %}
+                <p class="font-medium">{{ meter }}</p>
+            {% endfor %}
+        </div>
+
+        <div class="p-4 rounded-sm border border-slate-200">
+            <p class="text-xs uppercase tracking-wider text-slate-500">Emitido por</p>
+            <p class="font-medium">Premium Energía</p>
+        </div>
+        </div>
+
+        <div class="flex justify-center gap-12">
+        <img
+            src="{{ assets.logo_powerview }}"
+            alt="POWERVIEW"
+            class="w-full h-auto max-h-20 object-contain"
+        />
+        </div>
+    </div>
+</body>
+</html>

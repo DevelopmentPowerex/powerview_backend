@@ -8,6 +8,7 @@ from OnDemand.report_generator.auxiliar.date_info import dates_info as get_repor
 from OnDemand.report_generator.report_details import fetch_report_data
 from OnDemand.report_generator.chart_generator import generate_report_charts
 from OnDemand.report_generator.html_render import generate_html_report as generate_html
+from OnDemand.report_generator.render_pdf import render_to_pdf as html_to_pdf
 
 from .config import settings
 
@@ -16,10 +17,6 @@ setup_logging(settings.log_level)
 
 import logging
 logger = logging.getLogger(__name__)
-
-TEMPLATE_DIR = "OnDemand/report_generator/static/templates/"
-
-OUTPUT_HTML = "OnDemand/report_generator/result/editable_report.html"
 
 async def build_order(client_name:str,project_name:str,dates_part:Dict[str,Any],circuits_per_project, readings_for_report, events_for_report,charts_for_report): #Formar la orden JSON para el renderizador de la plantilla HTML
     
@@ -91,39 +88,53 @@ async def report_gen(client_name:str,
                      end_date:str): 
     
     dates_part = await get_report_dates(start_date,end_date) #RANGO DE FECHAS Y CODIGO CSV
-    logger.debug(dates_part)
+    
     if not dates_part:
         logger.error('Error while getting the date range')
         return None
-    
+    logger.debug(dates_part)
+
     report_readings= await fetch_report_data(client_name,project_name,start_date,end_date)
-    logger.debug(report_readings['report'])
+    
     if not report_readings:
         logger.error("Error fetching the project readings")
         return None
-    
+    logger.debug(report_readings['report'])
+
     charts_for_report=await generate_report_charts(report_readings.get('circuits'),report_readings.get('readings'),start_date,end_date)
-    logger.debug(charts_for_report)
+    
     if not charts_for_report:
         return None
-    
+    logger.debug(charts_for_report)
+
     new_report_order= await build_order(client_name,project_name,dates_part, report_readings.get('circuits'), report_readings.get('report'),report_readings.get('events'), charts_for_report)
-    logger.info(new_report_order)
+    
     if not new_report_order:
         logger.error('Error while generating the report order')
         return None
+    logger.debug(new_report_order)
+
+    html_parts= await generate_html(new_report_order)
     
+    if not html_parts:
+        logger.error('Error while rendering the html templates')
+        return None
+    logger.debug(html_parts)
     
-    html_report= await generate_html(TEMPLATE_DIR, OUTPUT_HTML, new_report_order)
-    if not html_report:
-        logger.error('Error while rendering the html report')
+    pdf_report= await html_to_pdf(html_parts)
     
-    return []
+    if not pdf_report:
+        logger.error("Error rendering from html report to pdf")
+        return None
+    
+    logger.info(f'Pdf report generated and save on: {pdf_report}')
+
+    return
     
     
 
 async def main():
-    test_report=await report_gen('ELECTROPROTECCIONES SAS','Proyecto A',"2026-01-19T17:48:00","2026-01-20T12:00:00")
+    test_report=await report_gen('Cooperativa Jardín Azuayo','Proyecto A',"2026-01-19T17:48:00","2026-01-20T12:00:00")
 
 if __name__ == "__main__":  
 

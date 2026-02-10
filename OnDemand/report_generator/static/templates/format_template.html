@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Formato Reporte | PowerView</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    /* ==============================
+       CONFIGURACIÓN DE PÁGINA
+       ============================== */
+    @page {
+      size: A4;
+      margin: 0;
+    }
+
+    @media print {
+      html, body {
+        margin: 0;
+        padding: 0;
+        background: white;
+      }
+
+      body {
+        font-family: "Inter", sans-serif;
+        color: #1e293b;
+      }
+
+      /* ALTURAS CLAVE (esto define el espacio en blanco) */
+      :root {
+        --header-height: 20mm;
+        --footer-height: 16mm;
+        --page-pad-x: 16mm;
+      }
+
+      /* HEADER FIJO */
+      header.header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: var(--header-height);
+        padding: 6mm var(--page-pad-x);
+        border-bottom: 1px solid #e5e7eb;
+        background: white;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      /* FOOTER FIJO */
+      footer.footer {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: var(--footer-height);
+        padding: 4mm var(--page-pad-x);
+        border-top: 1px solid #e5e7eb;
+        background: white;
+        font-size: 10px;
+        color: #64748b;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      /* CUERPO VACÍO (NO CONTENIDO) */
+      main.blank {
+        height: 297mm;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="flex items-center gap-3">
+      <img src="{{ assets.loguito }}" alt="PowerView" class="h-6">
+      <div class="text-sm">
+        <span class="font-semibold">Proyecto:</span>
+        {{ project_info.project_name }}
+      </div>
+    </div>
+
+    <div class="text-right text-xs text-slate-500">
+      <p><b>Cliente:</b> {{ project_info.client_name }}</p>
+      <p><b>Fecha:</b> {{ report_info.gen_date }}</p>
+    </div>
+  </header>
+
+  <!-- ESPACIO EN BLANCO -->
+  <main class="blank"></main>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <p>© PowerView by Powerex</p>
+    <p>Developed by Corso Insight Solutions</p>
+  </footer>
+
+</body>
+</html>

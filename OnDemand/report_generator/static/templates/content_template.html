@@ -1,0 +1,300 @@
+<!DOCTYPE html> 
+<html lang="es"> 
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Informe Periódico | PowerView</title>
+
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#eef7ff',
+              100: '#d9ecff',
+              200: '#aedaff',
+              300: '#7cc2ff',
+              400: '#4aa6ff',
+              500: '#1f86ff',
+              600: '#1068db',
+              700: '#0b50ad',
+              800: '#0a3e85',
+              900: '#082f66'
+            }
+          },
+          fontFamily: {
+            sans: [
+              "Inter",
+              "ui-sans-serif",
+              "system-ui",
+              "Segoe UI",
+              "Roboto",
+              "Helvetica",
+              "Arial",
+              "Noto Sans",
+              "Apple Color Emoji",
+              "Segoe UI Emoji"
+            ]
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* ==============================
+       CONFIGURACIÓN DE IMPRESIÓN
+       ============================== */
+
+    @page {
+      size: A4;
+      margin: 0;
+    }
+
+    @media print {
+      :root {
+        --header-height: 20mm;
+        --footer-height: 16mm;
+        --gap: 8mm;
+        --page-pad-x: 16mm;
+        --safe: 1mm;
+      }
+
+      /* Márgenes por página: se aplican en TODAS las hojas */
+      @page {
+        size: A4;
+        margin-top: calc(var(--header-height) + var(--gap) + var(--safe));
+        margin-bottom: calc(var(--footer-height) + var(--gap) + var(--safe));
+        margin-left: var(--page-pad-x);
+        margin-right: var(--page-pad-x);
+      }
+
+      .chart-img {
+        max-height: 70mm;
+        width: 100%;
+        object-fit: contain;
+      }
+
+      html, body {
+        margin: 0;
+        padding: 0;
+        background: white !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+
+      .ring-1, .ring-2, .ring, [class*="ring-"] {
+        box-shadow: none !important;
+      }
+
+      /* El main ya NO debe “simular” márgenes verticales */
+      main.content {
+        padding: 0; /* <-- clave */
+      }
+
+      /* Mantén tus reglas anti-cortes */
+      section, .grid-item, .card, .avoid-break {
+        border: 1px solid #e2e8f0 !important; /* slate-200 */
+        box-shadow: none !important;
+        background-clip: padding-box;
+        break-inside: avoid;
+        page-break-inside: avoid;
+      }
+
+      thead { display: table-header-group; }
+      tfoot { display: table-footer-group; }
+      tr { break-inside: avoid; }
+
+      .page-break { break-after: page; }
+    }
+
+
+    /* ==============================
+       VISUALIZACIÓN EN PANTALLA
+       ============================== */
+
+    @media screen {
+      body {
+        background-color: #f3f4f6;
+        padding: 20px;
+      }
+
+      .container {
+        max-width: 210mm;
+        margin: 0 auto;
+        background: white;
+        padding: 20mm;
+        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+      }
+    }
+
+    body {
+      font-family: "Inter", sans-serif;
+      color: #1e293b;
+    }
+  </style>
+</head>
+
+<body>
+    
+    <main class="content">
+            <!-- LECTURA DE PARAMETROS -->
+        <p class="mt-4 text-slate-700 leading-relaxed text-sm">
+        Los datos adjuntos en este informe fueron obtenidos a través del sistema de monitoreo y telemetría PowerView©. Este es un informe automatizado que incluye los detalles más relevantes del
+        sistema eléctrico dentro de las fechas solicitadas.
+        </p> 
+        <h2 class=" mt-4 text-2xl font-bold text-slate-900">1. Resumen de parámetros de cada circuito</h2>
+        
+        <p class="mt-4 text-sm text-slate-600">Valores máximo, mínimo y promedio para cada uno de los parametros eléctricos leídos dentro del rango de tiempo del informe.</p>
+
+        {% for circuit in circuits_list %}
+            <div section>
+            <h3 class="text-xl font-bold text-slate-900 mt-4">{{circuit.name}}</h3>
+            <div class="mt-4 grid grid-cols-1 grid-cols-3 gap-4">
+                {% for parameter,values in circuit.parameters_list.items() %}
+                    <div class="grid-item p-2 rounded-sm ring-1 ring-slate-200 text-xs">
+                        <p class="text-xs uppercase tracking-wider text-slate-500">{{parameter}}</p>
+                        <p class="mt-1 text-xl font-bold leading-none">———</p>
+                            
+                        <div class="mt-4 overflow-hidden rounded-sm ring-1 ring-slate-200">   
+                          <table class="w-full border-collapse text-[10px] leading-tight text-center">
+                                <thead class="bg-slate-50">
+                                    <tr>
+                                        <th class="font-semibold p-1">-</th>
+                                        <th class="font-semibold p-1">Max</th>
+                                        <th class="font-semibold p-1">Min</th>
+                                        <th class="font-semibold p-1">Prom</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    {% for value in values%}
+                                        <tr class="odd:bg-white even:bg-slate-50">
+                                            <td class="p-0.5"><b>{{value.name}}</b></td>
+                                            <td class="p-0.5">{{value.max}}</td>
+                                            <td class="p-0.5">{{value.min}}</td>
+                                            <td class="p-0.5">{{value.prom}}</td>
+                                        </tr>
+                                    {%endfor%}
+                                </tbody>
+                            </table>
+                        </div>
+                    
+                    </div>
+                {% endfor %}
+            </div>
+            <div class="page-break"></div>
+        </div>
+        {%endfor%}
+        
+    
+        <!-- GRAFICAS COMPORTAMIENTO -->
+        <h2 class="text-2xl font-bold text-slate-900 mt-4">2. Gráficas de comportamiento</h2>
+        <p class="mt-4 text-slate-700 leading-relaxed text-sm">
+        En las siguientes gráficas se puede revisar el comportamiento que han tenido los parámetros eléctricos de los circuitos monitoreados de {{project_info.project_name}}
+        </p>  
+        
+        {% for circuit in circuits_list %}
+            <div section>
+            
+                <h3 class="text-xl font-bold text-slate-900 mt-4">{{circuit.name}}</h3>
+                <div class="mt-4 grid grid-cols-1 gap-4">
+                    {% for graph in circuit.behaviour_images %}
+                        <div class="grid-item p-2 rounded-sm ring-1 ring-slate-200 text-xs">
+                            <p class="text-xs uppercase tracking-wider text-slate-500">{{graph.name}}</p>
+                            <p class="mt-1 text-xl font-bold leading-none">———</p>
+                            <img src="{{graph.image_uri}}" alt="{{graph.name}}" class="chart-img"/>
+                        </div> 
+                    {% endfor %}
+                </div>
+
+            </div> 
+            <div class="page-break"></div>
+        {% endfor %}
+
+
+        <!-- TABLA ALARMAS -->
+        <h2 class="mt-4 text-2xl font-bold text-slate-900">3. Alarmas ocurridas</h2>
+        <p class="mt-4 text-sm text-slate-600">
+            En caso de haberse presentado alguna eventualidad, esta fue notificada oportunamente a 
+            través del sistema automatizado de monitoreo. El registro de los eventos ocurridos es el siguiente.
+        </p>
+        {% if events %}
+            <div class="mt-4 overflow-hidden rounded-sm ring-1 ring-slate-200">   
+                <table class="w-full border-collapse text-[10px] leading-tight text-center">
+                    <thead class="bg-slate-50 text-[10px]">
+                        <tr>
+                            <th class="font-semibold p-3">#</th>
+                            <th class="font-semibold p-3">Circuito</th>
+                            <th class="font-semibold p-3">Contexto</th>
+                            <th class="font-semibold p-3">Regla rota</th>
+                            <th class="font-semibold p-3">Primer evento</th>
+                            <th class="font-semibold p-3">Último evento</th>
+                            <th class="font-semibold p-3">Cantidad de incidencias</th>
+                            <th class="font-semibold p-3">Severidad</th>
+                        </tr>
+                    </thead>
+                <tbody>
+                    {%for event in events%}
+                        <tr>
+        
+                            <td class="p-1">{{loop.index}}</td>
+                            <td class="p-1">{{event.circuit}}</td>
+                            <td class="p-1">{{event.context}}</td>
+                            <td class="p-1">{{event.rule}}</td>
+                            <td class="p-1">{{event.first_event| replace("T", " ")}}</td>
+                            <td class="p-1">{{event.last_event| replace("T", " ")}}</td>
+                            <td class="p-1">{{event.event_counter}}</td>
+                            {%if event.level == "CRITICAL"%}
+                                <td class="bg-red-600 p-3">CRITICA</td>
+                            {%elif event.level == "MID"%}  
+                                <td class="bg-orange-500 p-3">MEDIA</td>
+                            {%elif event.level == "LOW"%}  
+                                <td class="bg-yellow-300 p-3">BAJA</td>
+                            {%endif%}
+                            
+                        </tr>
+                    {%endfor%}
+                </tbody>
+                </table>
+            </div>
+        {%else%}
+        <p class="mt-4 text-slate-500 italic">No se registraron alarmas en el periodo.</p>
+        {%endif%}
+        
+    
+        <div class="page-break"></div>
+        <!-- ANEXOS Y CIERRE -->
+        <h2 class="mt-4 text-2xl font-bold text-slate-900">4. Anexos</h2>
+        <p class="mt-4 text-sm text-slate-600">En los siguientes archivos podrá encontrar la información completa que fue resumida en este informe.</p>
+        <ul class="mt-4 list-disc pl-6 text-slate-700 text-sm">
+            <li>Registro completo de las mediciones: {{report_info.csv}}.csv</li>
+            
+            {%if events%}
+            <li>Registro de alarmas emitidas: {{report_info.csv}}_eventos.csv</li>
+            {%endif%}
+
+        </ul><!-- Mensaje final -->
+        <div class="mt-16 flex items-center justify-center gap-3 text-sm text-slate-500">
+            <div>
+                <p class="mt-4 text-slate-700 leading-relaxed">
+                    En caso de necesitar mayor explicación o detalle de lo incluido en este informe, por favor comuniquese con su provedor de servicio <b>{{project_info.fae.company_name}}</b>
+                </p>
+                <p class="mt-4 text-slate-700 leading-relaxed">
+                    <b>Ingeniero Responsable: </b>
+                </p>
+                <p>{{project_info.fae.engineer_name}}</p>
+                <p>{{project_info.fae.email_addr}}</p>
+                <p>{{project_info.fae.phone}}</p>
+            </div>
+        </div>
+        
+    </main>
+
+</body>
+
+</html>
