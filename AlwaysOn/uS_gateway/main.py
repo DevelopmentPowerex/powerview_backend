@@ -3,9 +3,6 @@
 from dotenv import load_dotenv
 load_dotenv("./AlwaysOn/uS_gateway/.env.local")
 
-from .config import settings
-from .shared.logging_config import setup_logging
-
 import logging
 logger = logging.getLogger(__name__)
 
@@ -21,6 +18,7 @@ from OnDemand.gateway_connection.routes.extract_events_routes import router as e
 from OnDemand.gateway_connection.routes.extract_readings_routes import router as extract_measurements_router
 from OnDemand.gateway_connection.routes.main_order_routes import router as report_generation
 
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     try:
@@ -34,7 +32,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title="PowerView Internal Gateway",
     description="API gateway dedicated to PowerView structure",
-    version="0.1.0",
+    version="0.1.1",
     lifespan=lifespan
 )
 

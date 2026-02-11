@@ -131,14 +131,14 @@ async def report_gen(client_name:str,
     if not pdf_report:
         logger.error("Error rendering from html report to pdf")
         return None
-    logger.info(f'PDF report generated and saved on: {pdf_report}')
+    logger.debug(f'PDF report generated and saved on: {pdf_report}')
 
     excel_archive= await generate_csv(report_readings.get('circuits'),
                                     report_readings.get('readings'))
     if not excel_archive:
         logger.error("Error creating the csv register")
         return None
-    logger.info(f'Excel archive generated and saved on: {excel_archive}')
+    logger.debug(f'Excel archive generated and saved on: {excel_archive}')
 
     final_zip= await compress_to_zip(pdf_report,
                                      excel_archive,
@@ -146,7 +146,7 @@ async def report_gen(client_name:str,
     if not final_zip:
         logger.error("Error compressing the report archives")
         return None
-    logger.info(f'Zip archive generated and saved on: {final_zip}')
+    logger.debug(f'Zip archive generated and saved on: {final_zip}')
 
     return final_zip
     

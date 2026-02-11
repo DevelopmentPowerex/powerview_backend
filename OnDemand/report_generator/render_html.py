@@ -20,10 +20,10 @@ results = {
     "content": r"OnDemand\report_generator\temp\report_parts\html\content_result.html",
 }
 
-def file_uri(rel_path: str) -> str:
+async def file_uri(rel_path: str) -> str:
     return (STATIC_ROOT / rel_path).resolve().as_uri()
 
-def inject_graph_uris_inplace(report_data: dict) -> dict:
+async def inject_graph_uris_inplace(report_data: dict) -> dict:
 
     for circuit in report_data.get("circuits_list", []):
         for graph in circuit.get("behaviour_images", []):
@@ -36,12 +36,12 @@ async def generate_html_report(report_data: dict):
     try:
         env = Environment(loader=FileSystemLoader(templates_path))
 
-        inject_graph_uris_inplace(report_data)
+        await inject_graph_uris_inplace(report_data)
 
         report_data.setdefault("assets", {})
         report_data["assets"].update({
-            "logo_powerview": file_uri("img/logo_powerview.png"),
-            "loguito": file_uri("img/loguito.png"),
+            "logo_powerview": await file_uri("img/logo_powerview.png"),
+            "loguito": await file_uri("img/loguito.png"),
         })
 
         for part_key, template_name in templates.items():

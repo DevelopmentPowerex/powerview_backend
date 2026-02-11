@@ -19,19 +19,19 @@ router = APIRouter(
 @router.get("/generate")
 async def obtain_events(client_name: str = Query(...), 
                         project_name:str= Query(...),
-                        from_date:datetime= Query(...),
-                        to_date: datetime = Query(...)):
+                        from_date:str= Query(...),
+                        to_date: str = Query(...)):
     try:
         report_archives=await report_gen(client_name,project_name,from_date,to_date)
-        
-        zip_path = Path(report_archives)
+        if report_archives:
+            zip_path = Path(report_archives)
 
-        return FileResponse(
-                path=zip_path,
-                media_type="application/zip",
-                filename="report.zip"
-        )
-    
+            return FileResponse(
+                    path=zip_path,
+                    media_type="application/zip",
+                    filename="report.zip"
+            )
+        
     except Exception:
         logger.exception(f"Error while generating pdf and excel report for {project_name}")
         return None
