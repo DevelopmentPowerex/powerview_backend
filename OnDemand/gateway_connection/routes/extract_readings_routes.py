@@ -10,7 +10,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 router = APIRouter(
-    prefix="/displayable",  #Rutas dedicadas a la evaluación de reglas
+    prefix="/report", 
     tags=["MEASURE EXTRACTION"]    # Etiqueta para la documentación automática (Swagger/Redoc)
 )
 

@@ -1,0 +1,825 @@
+<!DOCTYPE html> 
+<html lang="es"> 
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Informe Periódico | PowerView</title>
+
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#eef7ff',
+              100: '#d9ecff',
+              200: '#aedaff',
+              300: '#7cc2ff',
+              400: '#4aa6ff',
+              500: '#1f86ff',
+              600: '#1068db',
+              700: '#0b50ad',
+              800: '#0a3e85',
+              900: '#082f66'
+            }
+          },
+          fontFamily: {
+            sans: [
+              "Inter",
+              "ui-sans-serif",
+              "system-ui",
+              "Segoe UI",
+              "Roboto",
+              "Helvetica",
+              "Arial",
+              "Noto Sans",
+              "Apple Color Emoji",
+              "Segoe UI Emoji"
+            ]
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* ==============================
+       CONFIGURACIÓN DE IMPRESIÓN
+       ============================== */
+
+    @page {
+      size: A4;
+      margin: 0;
+    }
+
+    @media print {
+      :root {
+        --header-height: 20mm;
+        --footer-height: 16mm;
+        --gap: 8mm;
+        --page-pad-x: 16mm;
+        --safe: 1mm;
+      }
+
+      /* Márgenes por página: se aplican en TODAS las hojas */
+      @page {
+        size: A4;
+        margin-top: calc(var(--header-height) + var(--gap) + var(--safe));
+        margin-bottom: calc(var(--footer-height) + var(--gap) + var(--safe));
+        margin-left: var(--page-pad-x);
+        margin-right: var(--page-pad-x);
+      }
+
+      .chart-img {
+        max-height: 70mm;
+        width: 100%;
+        object-fit: contain;
+      }
+
+      html, body {
+        margin: 0;
+        padding: 0;
+        background: white !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+
+      .ring-1, .ring-2, .ring, [class*="ring-"] {
+        box-shadow: none !important;
+      }
+
+      /* El main ya NO debe “simular” márgenes verticales */
+      main.content {
+        padding: 0; /* <-- clave */
+      }
+
+      /* Mantén tus reglas anti-cortes */
+      section, .grid-item, .card, .avoid-break {
+        border: 1px solid #e2e8f0 !important; /* slate-200 */
+        box-shadow: none !important;
+        background-clip: padding-box;
+        break-inside: avoid;
+        page-break-inside: avoid;
+      }
+
+      thead { display: table-header-group; }
+      tfoot { display: table-footer-group; }
+      tr { break-inside: avoid; }
+
+      .page-break { break-after: page; }
+    }
+
+
+    /* ==============================
+       VISUALIZACIÓN EN PANTALLA
+       ============================== */
+
+    @media screen {
+      body {
+        background-color: #f3f4f6;
+        padding: 20px;
+      }
+
+      .container {
+        max-width: 210mm;
+        margin: 0 auto;
+        background: white;
+        padding: 20mm;
+        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+      }
+    }
+
+    body {
+      font-family: "Inter", sans-serif;
+      color: #1e293b;
+    }
+  </style>
+</head>
+
+<body>
+    
+    <main class="content">
+            <!-- LECTURA DE PARAMETROS -->
+        <p class="mt-4 text-slate-700 leading-relaxed text-sm">
+        Los datos adjuntos en este informe fueron obtenidos a través del sistema de monitoreo y telemetría PowerView©. Este es un informe automatizado que incluye los detalles más relevantes del
+        sistema eléctrico dentro de las fechas solicitadas.
+        </p> 
+        <h2 class=" mt-4 text-2xl font-bold text-slate-900">1. Resumen de parámetros de cada circuito</h2>
+        
+        <p class="mt-4 text-sm text-slate-600">Valores máximo, mínimo y promedio para cada uno de los parametros eléctricos leídos dentro del rango de tiempo del informe.</p>
+
+        
+            <div section>
+            <h3 class="text-xl font-bold text-slate-900 mt-4">Medidor A</h3>
+            <div class="mt-4 grid grid-cols-1 grid-cols-3 gap-4">
+                
+                    <div class="grid-item p-2 rounded-sm ring-1 ring-slate-200 text-xs">
+                        <p class="text-xs uppercase tracking-wider text-slate-500">VOLTAJES FASE NEUTRO [V]</p>
+                        <p class="mt-1 text-xl font-bold leading-none">———</p>
+                            
+                        <div class="mt-4 overflow-hidden rounded-sm ring-1 ring-slate-200">   
+                          <table class="w-full border-collapse text-[10px] leading-tight text-center">
+                                <thead class="bg-slate-50">
+                                    <tr>
+                                        <th class="font-semibold p-1">-</th>
+                                        <th class="font-semibold p-1">Max</th>
+                                        <th class="font-semibold p-1">Min</th>
+                                        <th class="font-semibold p-1">Prom</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    
+                                        <tr class="odd:bg-white even:bg-slate-50">
+                                            <td class="p-0.5"><b>vA</b></td>
+                                            <td class="p-0.5">126.7</td>
+                                            <td class="p-0.5">120.5</td>
+                                            <td class="p-0.5">124.15</td>
+                                        </tr>
+                                    
+                                </tbody>
+                            </table>
+                        </div>
+                    
+                    </div>
+                
+                    <div class="grid-item p-2 rounded-sm ring-1 ring-slate-200 text-xs">
+                        <p class="text-xs uppercase tracking-wider text-slate-500">VOLTAJES FASE FASE [V]</p>
+                        <p class="mt-1 text-xl font-bold leading-none">———</p>
+                            
+                        <div class="mt-4 overflow-hidden rounded-sm ring-1 ring-slate-200">   
+                          <table class="w-full border-collapse text-[10px] leading-tight text-center">
+                                <thead class="bg-slate-50">
+                                    <tr>
+                                        <th class="font-semibold p-1">-</th>
+                                        <th class="font-semibold p-1">Max</th>
+                                        <th class="font-semibold p-1">Min</th>
+                                        <th class="font-semibold p-1">Prom</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    
+                                        <tr class="odd:bg-white even:bg-slate-50">
+                                            <td class="p-0.5"><b>vAB</b></td>
+                                            <td class="p-0.5">126.7</td>
+                                            <td class="p-0.5">120.5</td>
+                                            <td class="p-0.5">124.15</td>
+                                        </tr>
+                                    
+                                        <tr class="odd:bg-white even:bg-slate-50">
+                                            <td class="p-0.5"><b>vCA</b></td>
+                                            <td class="p-0.5">126.7</td>
+                                            <td class="p-0.5">120.5</td>
+                                            <td class="p-0.5">124.15</td>
+                                        </tr>
+                                    
+                                </tbody>
+                            </table>
+                        </div>
+                    
+                    </div>
+                
+                    <div class="grid-item p-2 rounded-sm ring-1 ring-slate-200 text-xs">
+                        <p class="text-xs uppercase tracking-wider text-slate-500">ENERGIA ACTIVA POSITIVA POR FASE [kWh]</p>
+                        <p class="mt-1 text-xl font-bold leading-none">———</p>
+                            
+                        <div class="mt-4 overflow-hidden rounded-sm ring-1 ring-slate-200">   
+                          <table class="w-full border-collapse text-[10px] leading-tight text-center">
+                                <thead class="bg-slate-50">
+                                    <tr>
+                                        <th class="font-semibold p-1">-</th>
+                                        <th class="font-semibold p-1">Max</th>
+                                        <th class="font-semibold p-1">Min</th>
+                                        <th class="font-semibold p-1">Prom</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    
+                                        <tr class="odd:bg-white even:bg-slate-50">
+                                            <td class="p-0.5"><b>P_kWh_A</b></td>
+                                            <td class="p-0.5">79.6</td>
+                                            <td class="p-0.5">79.6</td>
+                                            <td class="p-0.5">79.6</td>
+                                        </tr>
+                                    
+                                        <tr class="odd:bg-white even:bg-slate-50">
+                                            <td class="p-0.5"><b>P_kWh_B</b></td>
+                                            <td class="p-0.5">825.2</td>
+                                            <td class="p-0.5">825.2</td>
+                                            <td class="p-0.5">825.2</td>
+                                        </tr>
+                                    
+                                        <tr class="odd:bg-white even:bg-slate-50">
+                                            <td class="p-0.5"><b>P_kWh_C</b></td>
+                                            <td class="p-0.5">568.8</td>
+                                            <td class="p-0.5">568.8</td>
+                                            <td class="p-0.5">568.8</td>
+                                        </tr>
+                                    
+                                        <tr class="odd:bg-white even:bg-slate-50">
+                                            <td class="p-0.5"><b>P_kWh_T</b></td>
+                                            <td class="p-0.5">2160.4</td>
+                                            <td class="p-0.5">2160.4</td>
+                                            <td class="p-0.5">2160.4</td>
+                                        </tr>
+                                    
+                                </tbody>
+                            </table>
+                        </div>
+                    
+                    </div>
+                
+                    <div class="grid-item p-2 rounded-sm ring-1 ring-slate-200 text-xs">
+                        <p class="text-xs uppercase tracking-wider text-slate-500">ENERGIA REACTIVA POSITIVA POR FASE [kVarh]</p>
+                        <p class="mt-1 text-xl font-bold leading-none">———</p>
+                            
+                        <div class="mt-4 overflow-hidden rounded-sm ring-1 ring-slate-200">   
+                          <table class="w-full border-collapse text-[10px] leading-tight text-center">
+                                <thead class="bg-slate-50">
+                                    <tr>
+                                        <th class="font-semibold p-1">-</th>
+                                        <th class="font-semibold p-1">Max</th>
+                                        <th class="font-semibold p-1">Min</th>
+                                        <th class="font-semibold p-1">Prom</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    
+                                        <tr class="odd:bg-white even:bg-slate-50">
+                                            <td class="p-0.5"><b>P_kvarh_A</b></td>
+                                            <td class="p-0.5">4.4</td>
+                                            <td class="p-0.5">4.4</td>
+                                            <td class="p-0.5">4.4</td>
+                                        </tr>
+                                    
+                                        <tr class="odd:bg-white even:bg-slate-50">
+                                            <td class="p-0.5"><b>P_kvarh_B</b></td>
+                                            <td class="p-0.5">2</td>
+                                            <td class="p-0.5">2</td>
+                                            <td class="p-0.5">2</td>
+                                        </tr>
+                                    
+                                        <tr class="odd:bg-white even:bg-slate-50">
+                                            <td class="p-0.5"><b>P_kvarh_C</b></td>
+                                            <td class="p-0.5">2.8</td>
+                                            <td class="p-0.5">2.8</td>
+                                            <td class="p-0.5">2.8</td>
+                                        </tr>
+                                    
+                                        <tr class="odd:bg-white even:bg-slate-50">
+                                            <td class="p-0.5"><b>P_kvarh_T</b></td>
+                                            <td class="p-0.5">27.6</td>
+                                            <td class="p-0.5">27.6</td>
+                                            <td class="p-0.5">27.6</td>
+                                        </tr>
+                                    
+                                </tbody>
+                            </table>
+                        </div>
+                    
+                    </div>
+                
+                    <div class="grid-item p-2 rounded-sm ring-1 ring-slate-200 text-xs">
+                        <p class="text-xs uppercase tracking-wider text-slate-500">ENERGIA REACTIVA INVERSA POR FASE [kVarh]</p>
+                        <p class="mt-1 text-xl font-bold leading-none">———</p>
+                            
+                        <div class="mt-4 overflow-hidden rounded-sm ring-1 ring-slate-200">   
+                          <table class="w-full border-collapse text-[10px] leading-tight text-center">
+                                <thead class="bg-slate-50">
+                                    <tr>
+                                        <th class="font-semibold p-1">-</th>
+                                        <th class="font-semibold p-1">Max</th>
+                                        <th class="font-semibold p-1">Min</th>
+                                        <th class="font-semibold p-1">Prom</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    
+                                        <tr class="odd:bg-white even:bg-slate-50">
+                                            <td class="p-0.5"><b>R_kvarh_A</b></td>
+                                            <td class="p-0.5">410.8</td>
+                                            <td class="p-0.5">410.8</td>
+                                            <td class="p-0.5">410.8</td>
+                                        </tr>
+                                    
+                                        <tr class="odd:bg-white even:bg-slate-50">
+                                            <td class="p-0.5"><b>R_kvarh_B</b></td>
+                                            <td class="p-0.5">565.2</td>
+                                            <td class="p-0.5">565.2</td>
+                                            <td class="p-0.5">565.2</td>
+                                        </tr>
+                                    
+                                        <tr class="odd:bg-white even:bg-slate-50">
+                                            <td class="p-0.5"><b>R_kvarh_C</b></td>
+                                            <td class="p-0.5">538.4</td>
+                                            <td class="p-0.5">538.4</td>
+                                            <td class="p-0.5">538.4</td>
+                                        </tr>
+                                    
+                                        <tr class="odd:bg-white even:bg-slate-50">
+                                            <td class="p-0.5"><b>R_kvarh_T</b></td>
+                                            <td class="p-0.5">2012</td>
+                                            <td class="p-0.5">2012</td>
+                                            <td class="p-0.5">2012</td>
+                                        </tr>
+                                    
+                                </tbody>
+                            </table>
+                        </div>
+                    
+                    </div>
+                
+                    <div class="grid-item p-2 rounded-sm ring-1 ring-slate-200 text-xs">
+                        <p class="text-xs uppercase tracking-wider text-slate-500">Frecuencia [Hz]</p>
+                        <p class="mt-1 text-xl font-bold leading-none">———</p>
+                            
+                        <div class="mt-4 overflow-hidden rounded-sm ring-1 ring-slate-200">   
+                          <table class="w-full border-collapse text-[10px] leading-tight text-center">
+                                <thead class="bg-slate-50">
+                                    <tr>
+                                        <th class="font-semibold p-1">-</th>
+                                        <th class="font-semibold p-1">Max</th>
+                                        <th class="font-semibold p-1">Min</th>
+                                        <th class="font-semibold p-1">Prom</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    
+                                        <tr class="odd:bg-white even:bg-slate-50">
+                                            <td class="p-0.5"><b>F</b></td>
+                                            <td class="p-0.5">60.01</td>
+                                            <td class="p-0.5">59.93</td>
+                                            <td class="p-0.5">59.98</td>
+                                        </tr>
+                                    
+                                </tbody>
+                            </table>
+                        </div>
+                    
+                    </div>
+                
+                    <div class="grid-item p-2 rounded-sm ring-1 ring-slate-200 text-xs">
+                        <p class="text-xs uppercase tracking-wider text-slate-500">Factor de Potencia</p>
+                        <p class="mt-1 text-xl font-bold leading-none">———</p>
+                            
+                        <div class="mt-4 overflow-hidden rounded-sm ring-1 ring-slate-200">   
+                          <table class="w-full border-collapse text-[10px] leading-tight text-center">
+                                <thead class="bg-slate-50">
+                                    <tr>
+                                        <th class="font-semibold p-1">-</th>
+                                        <th class="font-semibold p-1">Max</th>
+                                        <th class="font-semibold p-1">Min</th>
+                                        <th class="font-semibold p-1">Prom</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    
+                                        <tr class="odd:bg-white even:bg-slate-50">
+                                            <td class="p-0.5"><b>PF</b></td>
+                                            <td class="p-0.5">1</td>
+                                            <td class="p-0.5">1</td>
+                                            <td class="p-0.5">1</td>
+                                        </tr>
+                                    
+                                </tbody>
+                            </table>
+                        </div>
+                    
+                    </div>
+                
+            </div>
+            <div class="page-break"></div>
+        </div>
+        
+            <div section>
+            <h3 class="text-xl font-bold text-slate-900 mt-4">Medidor B</h3>
+            <div class="mt-4 grid grid-cols-1 grid-cols-3 gap-4">
+                
+                    <div class="grid-item p-2 rounded-sm ring-1 ring-slate-200 text-xs">
+                        <p class="text-xs uppercase tracking-wider text-slate-500">VOLTAJES FASE NEUTRO [V]</p>
+                        <p class="mt-1 text-xl font-bold leading-none">———</p>
+                            
+                        <div class="mt-4 overflow-hidden rounded-sm ring-1 ring-slate-200">   
+                          <table class="w-full border-collapse text-[10px] leading-tight text-center">
+                                <thead class="bg-slate-50">
+                                    <tr>
+                                        <th class="font-semibold p-1">-</th>
+                                        <th class="font-semibold p-1">Max</th>
+                                        <th class="font-semibold p-1">Min</th>
+                                        <th class="font-semibold p-1">Prom</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    
+                                        <tr class="odd:bg-white even:bg-slate-50">
+                                            <td class="p-0.5"><b>vB</b></td>
+                                            <td class="p-0.5">123.5</td>
+                                            <td class="p-0.5">0</td>
+                                            <td class="p-0.5">114.44</td>
+                                        </tr>
+                                    
+                                </tbody>
+                            </table>
+                        </div>
+                    
+                    </div>
+                
+                    <div class="grid-item p-2 rounded-sm ring-1 ring-slate-200 text-xs">
+                        <p class="text-xs uppercase tracking-wider text-slate-500">VOLTAJES FASE FASE [V]</p>
+                        <p class="mt-1 text-xl font-bold leading-none">———</p>
+                            
+                        <div class="mt-4 overflow-hidden rounded-sm ring-1 ring-slate-200">   
+                          <table class="w-full border-collapse text-[10px] leading-tight text-center">
+                                <thead class="bg-slate-50">
+                                    <tr>
+                                        <th class="font-semibold p-1">-</th>
+                                        <th class="font-semibold p-1">Max</th>
+                                        <th class="font-semibold p-1">Min</th>
+                                        <th class="font-semibold p-1">Prom</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    
+                                        <tr class="odd:bg-white even:bg-slate-50">
+                                            <td class="p-0.5"><b>vAB</b></td>
+                                            <td class="p-0.5">123.5</td>
+                                            <td class="p-0.5">0</td>
+                                            <td class="p-0.5">114.44</td>
+                                        </tr>
+                                    
+                                        <tr class="odd:bg-white even:bg-slate-50">
+                                            <td class="p-0.5"><b>vBC</b></td>
+                                            <td class="p-0.5">123.5</td>
+                                            <td class="p-0.5">0</td>
+                                            <td class="p-0.5">114.44</td>
+                                        </tr>
+                                    
+                                </tbody>
+                            </table>
+                        </div>
+                    
+                    </div>
+                
+                    <div class="grid-item p-2 rounded-sm ring-1 ring-slate-200 text-xs">
+                        <p class="text-xs uppercase tracking-wider text-slate-500">Frecuencia [Hz]</p>
+                        <p class="mt-1 text-xl font-bold leading-none">———</p>
+                            
+                        <div class="mt-4 overflow-hidden rounded-sm ring-1 ring-slate-200">   
+                          <table class="w-full border-collapse text-[10px] leading-tight text-center">
+                                <thead class="bg-slate-50">
+                                    <tr>
+                                        <th class="font-semibold p-1">-</th>
+                                        <th class="font-semibold p-1">Max</th>
+                                        <th class="font-semibold p-1">Min</th>
+                                        <th class="font-semibold p-1">Prom</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    
+                                        <tr class="odd:bg-white even:bg-slate-50">
+                                            <td class="p-0.5"><b>F</b></td>
+                                            <td class="p-0.5">60.03</td>
+                                            <td class="p-0.5">0</td>
+                                            <td class="p-0.5">57.13</td>
+                                        </tr>
+                                    
+                                </tbody>
+                            </table>
+                        </div>
+                    
+                    </div>
+                
+                    <div class="grid-item p-2 rounded-sm ring-1 ring-slate-200 text-xs">
+                        <p class="text-xs uppercase tracking-wider text-slate-500">Factor de Potencia</p>
+                        <p class="mt-1 text-xl font-bold leading-none">———</p>
+                            
+                        <div class="mt-4 overflow-hidden rounded-sm ring-1 ring-slate-200">   
+                          <table class="w-full border-collapse text-[10px] leading-tight text-center">
+                                <thead class="bg-slate-50">
+                                    <tr>
+                                        <th class="font-semibold p-1">-</th>
+                                        <th class="font-semibold p-1">Max</th>
+                                        <th class="font-semibold p-1">Min</th>
+                                        <th class="font-semibold p-1">Prom</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    
+                                        <tr class="odd:bg-white even:bg-slate-50">
+                                            <td class="p-0.5"><b>PF</b></td>
+                                            <td class="p-0.5">1</td>
+                                            <td class="p-0.5">1</td>
+                                            <td class="p-0.5">1</td>
+                                        </tr>
+                                    
+                                </tbody>
+                            </table>
+                        </div>
+                    
+                    </div>
+                
+            </div>
+            <div class="page-break"></div>
+        </div>
+        
+        
+    
+        <!-- GRAFICAS COMPORTAMIENTO -->
+        <h2 class="text-2xl font-bold text-slate-900 mt-4">2. Gráficas de comportamiento</h2>
+        <p class="mt-4 text-slate-700 leading-relaxed text-sm">
+        En las siguientes gráficas se puede revisar el comportamiento que han tenido los parámetros eléctricos de los circuitos monitoreados de Proyecto A
+        </p>  
+        
+        
+            <div section>
+            
+                <h3 class="text-xl font-bold text-slate-900 mt-4">Medidor A</h3>
+                <div class="mt-4 grid grid-cols-1 gap-4">
+                    
+                        <div class="grid-item p-2 rounded-sm ring-1 ring-slate-200 text-xs">
+                            <p class="text-xs uppercase tracking-wider text-slate-500">VOLTAJES FASE NEUTRO [V]</p>
+                            <p class="mt-1 text-xl font-bold leading-none">———</p>
+                            <img src="file:///C:/Users/jeras/Documents/PowerView/backend_pv/OnDemand/report_generator/temp/gen_graphs/meter1_chart_voltage_PN.png" alt="VOLTAJES FASE NEUTRO [V]" class="chart-img"/>
+                        </div> 
+                    
+                        <div class="grid-item p-2 rounded-sm ring-1 ring-slate-200 text-xs">
+                            <p class="text-xs uppercase tracking-wider text-slate-500">VOLTAJES FASE FASE [V]</p>
+                            <p class="mt-1 text-xl font-bold leading-none">———</p>
+                            <img src="file:///C:/Users/jeras/Documents/PowerView/backend_pv/OnDemand/report_generator/temp/gen_graphs/meter1_chart_voltage_PP.png" alt="VOLTAJES FASE FASE [V]" class="chart-img"/>
+                        </div> 
+                    
+                        <div class="grid-item p-2 rounded-sm ring-1 ring-slate-200 text-xs">
+                            <p class="text-xs uppercase tracking-wider text-slate-500">CORRIENTES POR FASE [A]</p>
+                            <p class="mt-1 text-xl font-bold leading-none">———</p>
+                            <img src="file:///C:/Users/jeras/Documents/PowerView/backend_pv/OnDemand/report_generator/temp/gen_graphs/meter1_chart_current.png" alt="CORRIENTES POR FASE [A]" class="chart-img"/>
+                        </div> 
+                    
+                        <div class="grid-item p-2 rounded-sm ring-1 ring-slate-200 text-xs">
+                            <p class="text-xs uppercase tracking-wider text-slate-500">POTENCIA ACTIVA POR FASE [kW]</p>
+                            <p class="mt-1 text-xl font-bold leading-none">———</p>
+                            <img src="file:///C:/Users/jeras/Documents/PowerView/backend_pv/OnDemand/report_generator/temp/gen_graphs/meter1_chart_active_power.png" alt="POTENCIA ACTIVA POR FASE [kW]" class="chart-img"/>
+                        </div> 
+                    
+                        <div class="grid-item p-2 rounded-sm ring-1 ring-slate-200 text-xs">
+                            <p class="text-xs uppercase tracking-wider text-slate-500">POTENCIA REACTIVA POR FASE [kVAR]</p>
+                            <p class="mt-1 text-xl font-bold leading-none">———</p>
+                            <img src="file:///C:/Users/jeras/Documents/PowerView/backend_pv/OnDemand/report_generator/temp/gen_graphs/meter1_chart_reactive_power.png" alt="POTENCIA REACTIVA POR FASE [kVAR]" class="chart-img"/>
+                        </div> 
+                    
+                        <div class="grid-item p-2 rounded-sm ring-1 ring-slate-200 text-xs">
+                            <p class="text-xs uppercase tracking-wider text-slate-500">POTENCIA APARENTE POR FASE [kVA]</p>
+                            <p class="mt-1 text-xl font-bold leading-none">———</p>
+                            <img src="file:///C:/Users/jeras/Documents/PowerView/backend_pv/OnDemand/report_generator/temp/gen_graphs/meter1_chart_aparent_power.png" alt="POTENCIA APARENTE POR FASE [kVA]" class="chart-img"/>
+                        </div> 
+                    
+                        <div class="grid-item p-2 rounded-sm ring-1 ring-slate-200 text-xs">
+                            <p class="text-xs uppercase tracking-wider text-slate-500">ENERGIA ACTIVA POSITIVA POR FASE [kWh]</p>
+                            <p class="mt-1 text-xl font-bold leading-none">———</p>
+                            <img src="file:///C:/Users/jeras/Documents/PowerView/backend_pv/OnDemand/report_generator/temp/gen_graphs/meter1_chart_active_positive_energy.png" alt="ENERGIA ACTIVA POSITIVA POR FASE [kWh]" class="chart-img"/>
+                        </div> 
+                    
+                        <div class="grid-item p-2 rounded-sm ring-1 ring-slate-200 text-xs">
+                            <p class="text-xs uppercase tracking-wider text-slate-500">ENERGIA ACTIVA INVERSA POR FASE [kWh]</p>
+                            <p class="mt-1 text-xl font-bold leading-none">———</p>
+                            <img src="file:///C:/Users/jeras/Documents/PowerView/backend_pv/OnDemand/report_generator/temp/gen_graphs/meter1_chart_active_reverse_energy.png" alt="ENERGIA ACTIVA INVERSA POR FASE [kWh]" class="chart-img"/>
+                        </div> 
+                    
+                        <div class="grid-item p-2 rounded-sm ring-1 ring-slate-200 text-xs">
+                            <p class="text-xs uppercase tracking-wider text-slate-500">ENERGIA REACTIVA POSITIVA POR FASE [kVarh]</p>
+                            <p class="mt-1 text-xl font-bold leading-none">———</p>
+                            <img src="file:///C:/Users/jeras/Documents/PowerView/backend_pv/OnDemand/report_generator/temp/gen_graphs/meter1_chart_reactive_positive_energy.png" alt="ENERGIA REACTIVA POSITIVA POR FASE [kVarh]" class="chart-img"/>
+                        </div> 
+                    
+                        <div class="grid-item p-2 rounded-sm ring-1 ring-slate-200 text-xs">
+                            <p class="text-xs uppercase tracking-wider text-slate-500">ENERGIA REACTIVA INVERSA POR FASE [kVarh]</p>
+                            <p class="mt-1 text-xl font-bold leading-none">———</p>
+                            <img src="file:///C:/Users/jeras/Documents/PowerView/backend_pv/OnDemand/report_generator/temp/gen_graphs/meter1_chart_reactive_reverse_energy.png" alt="ENERGIA REACTIVA INVERSA POR FASE [kVarh]" class="chart-img"/>
+                        </div> 
+                    
+                        <div class="grid-item p-2 rounded-sm ring-1 ring-slate-200 text-xs">
+                            <p class="text-xs uppercase tracking-wider text-slate-500">Frecuencia [Hz]</p>
+                            <p class="mt-1 text-xl font-bold leading-none">———</p>
+                            <img src="file:///C:/Users/jeras/Documents/PowerView/backend_pv/OnDemand/report_generator/temp/gen_graphs/meter1_chart_frequency.png" alt="Frecuencia [Hz]" class="chart-img"/>
+                        </div> 
+                    
+                        <div class="grid-item p-2 rounded-sm ring-1 ring-slate-200 text-xs">
+                            <p class="text-xs uppercase tracking-wider text-slate-500">Factor de Potencia</p>
+                            <p class="mt-1 text-xl font-bold leading-none">———</p>
+                            <img src="file:///C:/Users/jeras/Documents/PowerView/backend_pv/OnDemand/report_generator/temp/gen_graphs/meter1_chart_power_factor.png" alt="Factor de Potencia" class="chart-img"/>
+                        </div> 
+                    
+                </div>
+
+            </div> 
+            <div class="page-break"></div>
+        
+            <div section>
+            
+                <h3 class="text-xl font-bold text-slate-900 mt-4">Medidor B</h3>
+                <div class="mt-4 grid grid-cols-1 gap-4">
+                    
+                        <div class="grid-item p-2 rounded-sm ring-1 ring-slate-200 text-xs">
+                            <p class="text-xs uppercase tracking-wider text-slate-500">VOLTAJES FASE NEUTRO [V]</p>
+                            <p class="mt-1 text-xl font-bold leading-none">———</p>
+                            <img src="file:///C:/Users/jeras/Documents/PowerView/backend_pv/OnDemand/report_generator/temp/gen_graphs/meter2_chart_voltage_PN.png" alt="VOLTAJES FASE NEUTRO [V]" class="chart-img"/>
+                        </div> 
+                    
+                        <div class="grid-item p-2 rounded-sm ring-1 ring-slate-200 text-xs">
+                            <p class="text-xs uppercase tracking-wider text-slate-500">VOLTAJES FASE FASE [V]</p>
+                            <p class="mt-1 text-xl font-bold leading-none">———</p>
+                            <img src="file:///C:/Users/jeras/Documents/PowerView/backend_pv/OnDemand/report_generator/temp/gen_graphs/meter2_chart_voltage_PP.png" alt="VOLTAJES FASE FASE [V]" class="chart-img"/>
+                        </div> 
+                    
+                        <div class="grid-item p-2 rounded-sm ring-1 ring-slate-200 text-xs">
+                            <p class="text-xs uppercase tracking-wider text-slate-500">CORRIENTES POR FASE [A]</p>
+                            <p class="mt-1 text-xl font-bold leading-none">———</p>
+                            <img src="file:///C:/Users/jeras/Documents/PowerView/backend_pv/OnDemand/report_generator/temp/gen_graphs/meter2_chart_current.png" alt="CORRIENTES POR FASE [A]" class="chart-img"/>
+                        </div> 
+                    
+                        <div class="grid-item p-2 rounded-sm ring-1 ring-slate-200 text-xs">
+                            <p class="text-xs uppercase tracking-wider text-slate-500">POTENCIA ACTIVA POR FASE [kW]</p>
+                            <p class="mt-1 text-xl font-bold leading-none">———</p>
+                            <img src="file:///C:/Users/jeras/Documents/PowerView/backend_pv/OnDemand/report_generator/temp/gen_graphs/meter2_chart_active_power.png" alt="POTENCIA ACTIVA POR FASE [kW]" class="chart-img"/>
+                        </div> 
+                    
+                        <div class="grid-item p-2 rounded-sm ring-1 ring-slate-200 text-xs">
+                            <p class="text-xs uppercase tracking-wider text-slate-500">POTENCIA REACTIVA POR FASE [kVAR]</p>
+                            <p class="mt-1 text-xl font-bold leading-none">———</p>
+                            <img src="file:///C:/Users/jeras/Documents/PowerView/backend_pv/OnDemand/report_generator/temp/gen_graphs/meter2_chart_reactive_power.png" alt="POTENCIA REACTIVA POR FASE [kVAR]" class="chart-img"/>
+                        </div> 
+                    
+                        <div class="grid-item p-2 rounded-sm ring-1 ring-slate-200 text-xs">
+                            <p class="text-xs uppercase tracking-wider text-slate-500">POTENCIA APARENTE POR FASE [kVA]</p>
+                            <p class="mt-1 text-xl font-bold leading-none">———</p>
+                            <img src="file:///C:/Users/jeras/Documents/PowerView/backend_pv/OnDemand/report_generator/temp/gen_graphs/meter2_chart_aparent_power.png" alt="POTENCIA APARENTE POR FASE [kVA]" class="chart-img"/>
+                        </div> 
+                    
+                        <div class="grid-item p-2 rounded-sm ring-1 ring-slate-200 text-xs">
+                            <p class="text-xs uppercase tracking-wider text-slate-500">ENERGIA ACTIVA POSITIVA POR FASE [kWh]</p>
+                            <p class="mt-1 text-xl font-bold leading-none">———</p>
+                            <img src="file:///C:/Users/jeras/Documents/PowerView/backend_pv/OnDemand/report_generator/temp/gen_graphs/meter2_chart_active_positive_energy.png" alt="ENERGIA ACTIVA POSITIVA POR FASE [kWh]" class="chart-img"/>
+                        </div> 
+                    
+                        <div class="grid-item p-2 rounded-sm ring-1 ring-slate-200 text-xs">
+                            <p class="text-xs uppercase tracking-wider text-slate-500">ENERGIA ACTIVA INVERSA POR FASE [kWh]</p>
+                            <p class="mt-1 text-xl font-bold leading-none">———</p>
+                            <img src="file:///C:/Users/jeras/Documents/PowerView/backend_pv/OnDemand/report_generator/temp/gen_graphs/meter2_chart_active_reverse_energy.png" alt="ENERGIA ACTIVA INVERSA POR FASE [kWh]" class="chart-img"/>
+                        </div> 
+                    
+                        <div class="grid-item p-2 rounded-sm ring-1 ring-slate-200 text-xs">
+                            <p class="text-xs uppercase tracking-wider text-slate-500">ENERGIA REACTIVA POSITIVA POR FASE [kVarh]</p>
+                            <p class="mt-1 text-xl font-bold leading-none">———</p>
+                            <img src="file:///C:/Users/jeras/Documents/PowerView/backend_pv/OnDemand/report_generator/temp/gen_graphs/meter2_chart_reactive_positive_energy.png" alt="ENERGIA REACTIVA POSITIVA POR FASE [kVarh]" class="chart-img"/>
+                        </div> 
+                    
+                        <div class="grid-item p-2 rounded-sm ring-1 ring-slate-200 text-xs">
+                            <p class="text-xs uppercase tracking-wider text-slate-500">ENERGIA REACTIVA INVERSA POR FASE [kVarh]</p>
+                            <p class="mt-1 text-xl font-bold leading-none">———</p>
+                            <img src="file:///C:/Users/jeras/Documents/PowerView/backend_pv/OnDemand/report_generator/temp/gen_graphs/meter2_chart_reactive_reverse_energy.png" alt="ENERGIA REACTIVA INVERSA POR FASE [kVarh]" class="chart-img"/>
+                        </div> 
+                    
+                        <div class="grid-item p-2 rounded-sm ring-1 ring-slate-200 text-xs">
+                            <p class="text-xs uppercase tracking-wider text-slate-500">Frecuencia [Hz]</p>
+                            <p class="mt-1 text-xl font-bold leading-none">———</p>
+                            <img src="file:///C:/Users/jeras/Documents/PowerView/backend_pv/OnDemand/report_generator/temp/gen_graphs/meter2_chart_frequency.png" alt="Frecuencia [Hz]" class="chart-img"/>
+                        </div> 
+                    
+                        <div class="grid-item p-2 rounded-sm ring-1 ring-slate-200 text-xs">
+                            <p class="text-xs uppercase tracking-wider text-slate-500">Factor de Potencia</p>
+                            <p class="mt-1 text-xl font-bold leading-none">———</p>
+                            <img src="file:///C:/Users/jeras/Documents/PowerView/backend_pv/OnDemand/report_generator/temp/gen_graphs/meter2_chart_power_factor.png" alt="Factor de Potencia" class="chart-img"/>
+                        </div> 
+                    
+                </div>
+
+            </div> 
+            <div class="page-break"></div>
+        
+
+
+        <!-- TABLA ALARMAS -->
+        <h2 class="mt-4 text-2xl font-bold text-slate-900">3. Alarmas ocurridas</h2>
+        <p class="mt-4 text-sm text-slate-600">
+            En caso de haberse presentado alguna eventualidad, esta fue notificada oportunamente a 
+            través del sistema automatizado de monitoreo. El registro de los eventos ocurridos es el siguiente.
+        </p>
+        
+            <div class="mt-4 overflow-hidden rounded-sm ring-1 ring-slate-200">   
+                <table class="w-full border-collapse text-[10px] leading-tight text-center">
+                    <thead class="bg-slate-50 text-[10px]">
+                        <tr>
+                            <th class="font-semibold p-3">#</th>
+                            <th class="font-semibold p-3">Circuito</th>
+                            <th class="font-semibold p-3">Contexto</th>
+                            <th class="font-semibold p-3">Regla rota</th>
+                            <th class="font-semibold p-3">Primer evento</th>
+                            <th class="font-semibold p-3">Último evento</th>
+                            <th class="font-semibold p-3">Cantidad de incidencias</th>
+                            <th class="font-semibold p-3">Severidad</th>
+                        </tr>
+                    </thead>
+                <tbody>
+                    
+                        <tr>
+        
+                            <td class="p-1">1</td>
+                            <td class="p-1">Medidor B</td>
+                            <td class="p-1">Salida de UPS en cero</td>
+                            <td class="p-1">vB=0.0</td>
+                            <td class="p-1">2026-01-19 23:16:36</td>
+                            <td class="p-1">2026-01-19 23:16:36</td>
+                            <td class="p-1">1</td>
+                              
+                                <td class="bg-orange-500 p-3">MEDIA</td>
+                            
+                            
+                        </tr>
+                    
+                </tbody>
+                </table>
+            </div>
+        
+        
+    
+        <div class="page-break"></div>
+        <!-- ANEXOS Y CIERRE -->
+        <h2 class="mt-4 text-2xl font-bold text-slate-900">4. Anexos</h2>
+        <p class="mt-4 text-sm text-slate-600">
+          En el archivo adjunto a este informe podrá encontrar todas las lecturas realizadas en Proyecto A desde 2026-01-19 hasta 2026-01-20 
+        </p>
+        <ul class="mt-4 list-disc pl-6 text-slate-700 text-sm">
+            <li>Registro completo de las mediciones: cooperativa_jardín_azuayo_proyecto_a_1901_2001.xlsx</li>
+            
+        </ul><!-- Mensaje final -->
+        <div class="mt-16 flex items-center justify-center gap-3 text-sm text-slate-500">
+            <div>
+                <p class="mt-4 text-slate-700 leading-relaxed">
+                    En caso de necesitar mayor explicación o detalle de lo incluido en este informe, por favor comuniquese con su provedor de servicio <b>PREMIUMENERGIA SAS</b>
+                </p>
+                <p class="mt-4 text-slate-700 leading-relaxed">
+                    <b>Ingeniero Responsable: </b>
+                </p>
+                <p>Ing. Jeramhil Javier Solis Yari</p>
+                <p>proyectos@premium-energia.com</p>
+                <p>0984373697</p>
+            </div>
+        </div>
+        
+    </main>
+
+</body>
+
+</html>

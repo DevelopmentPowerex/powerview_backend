@@ -7,8 +7,10 @@ from typing import Optional,Any,Dict,List
 from OnDemand.report_generator.auxiliar.date_info import dates_info as get_report_dates
 from OnDemand.report_generator.report_details import fetch_report_data
 from OnDemand.report_generator.chart_generator import generate_report_charts
-from OnDemand.report_generator.html_render import generate_html_report as generate_html
+from OnDemand.report_generator.render_html import generate_html_report as generate_html
 from OnDemand.report_generator.render_pdf import render_to_pdf as html_to_pdf
+from OnDemand.report_generator.create_csv import generate_csv
+from OnDemand.report_generator.compress_reports import compress_to_zip
 
 from .config import settings
 
@@ -39,7 +41,6 @@ async def build_order(client_name:str,project_name:str,dates_part:Dict[str,Any],
         
     new_events_list=[]
     for event in events_for_report:
-        #Mayor numero, mayor gravedad
         match event.get('level'):
             case 1:
                 new_level="LOW"
@@ -87,49 +88,67 @@ async def report_gen(client_name:str,
                      start_date:str,
                      end_date:str): 
     
-    dates_part = await get_report_dates(start_date,end_date) #RANGO DE FECHAS Y CODIGO CSV
-    
+    dates_part = await get_report_dates(start_date,
+                                        end_date)
     if not dates_part:
         logger.error('Error while getting the date range')
         return None
     logger.debug(dates_part)
 
-    report_readings= await fetch_report_data(client_name,project_name,start_date,end_date)
-    
+    report_readings= await fetch_report_data(client_name,
+                                             project_name,
+                                             start_date,
+                                             end_date)
     if not report_readings:
         logger.error("Error fetching the project readings")
         return None
     logger.debug(report_readings['report'])
 
-    charts_for_report=await generate_report_charts(report_readings.get('circuits'),report_readings.get('readings'),start_date,end_date)
-    
+    charts_for_report=await generate_report_charts(report_readings.get('circuits'),
+                                                   report_readings.get('readings'),
+                                                   start_date,end_date)
     if not charts_for_report:
         return None
     logger.debug(charts_for_report)
 
-    new_report_order= await build_order(client_name,project_name,dates_part, report_readings.get('circuits'), report_readings.get('report'),report_readings.get('events'), charts_for_report)
-    
+    new_report_order= await build_order(client_name,project_name,dates_part, 
+                                        report_readings.get('circuits'), 
+                                        report_readings.get('report'),
+                                        report_readings.get('events'), 
+                                        charts_for_report)
     if not new_report_order:
         logger.error('Error while generating the report order')
         return None
     logger.debug(new_report_order)
 
     html_parts= await generate_html(new_report_order)
-    
     if not html_parts:
         logger.error('Error while rendering the html templates')
         return None
     logger.debug(html_parts)
     
     pdf_report= await html_to_pdf(html_parts)
-    
     if not pdf_report:
         logger.error("Error rendering from html report to pdf")
         return None
-    
-    logger.info(f'Pdf report generated and save on: {pdf_report}')
+    logger.info(f'PDF report generated and saved on: {pdf_report}')
 
-    return
+    excel_archive= await generate_csv(report_readings.get('circuits'),
+                                    report_readings.get('readings'))
+    if not excel_archive:
+        logger.error("Error creating the csv register")
+        return None
+    logger.info(f'Excel archive generated and saved on: {excel_archive}')
+
+    final_zip= await compress_to_zip(pdf_report,
+                                     excel_archive,
+                                    r"OnDemand\report_generator\result\report.zip")
+    if not final_zip:
+        logger.error("Error compressing the report archives")
+        return None
+    logger.info(f'Zip archive generated and saved on: {final_zip}')
+
+    return final_zip
     
     
 

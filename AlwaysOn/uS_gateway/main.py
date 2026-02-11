@@ -19,6 +19,7 @@ from .routes.notify_events_routes import router as notifier_router
 
 from OnDemand.gateway_connection.routes.extract_events_routes import router as extract_event_router
 from OnDemand.gateway_connection.routes.extract_readings_routes import router as extract_measurements_router
+from OnDemand.gateway_connection.routes.main_order_routes import router as report_generation
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -42,6 +43,7 @@ app.include_router(evaluator_router)
 app.include_router(notifier_router)
 app.include_router(extract_measurements_router)
 app.include_router(extract_event_router)
+app.include_router(report_generation)
 
 @app.get("/")
 async def root():

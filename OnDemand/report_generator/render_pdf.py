@@ -9,10 +9,10 @@ import logging
 logger = logging.getLogger(__name__)
 
 pdf_results={
-    'cover':r"OnDemand\report_generator\result\report_cover.pdf",
-    'format':r"OnDemand\report_generator\result\report_format.pdf",    
-    'content':r"OnDemand\report_generator\result\report_content.pdf",
-    'full_content':r"OnDemand\report_generator\result\report_full_content.pdf",
+    'cover':r"OnDemand\report_generator\temp\report_parts\pdf\report_cover.pdf",
+    'format':r"OnDemand\report_generator\temp\report_parts\pdf\report_format.pdf",    
+    'content':r"OnDemand\report_generator\temp\report_parts\pdf\report_content.pdf",
+    'full_content':r"OnDemand\report_generator\temp\report_parts\pdf\report_full_content.pdf",
     'final':r"OnDemand\report_generator\result\report.pdf"
 }
 
