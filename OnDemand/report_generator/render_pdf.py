@@ -4,17 +4,10 @@ from playwright.async_api import async_playwright
 import copy
 from typing import Optional,Dict,Any
 
+from OnDemand.report_generator.protocols.auxiliar_info import PDF_RESULT_PATHS
 
 import logging
 logger = logging.getLogger(__name__)
-
-pdf_results={
-    'cover':r"OnDemand\report_generator\temp\report_parts\pdf\report_cover.pdf",
-    'format':r"OnDemand\report_generator\temp\report_parts\pdf\report_format.pdf",    
-    'content':r"OnDemand\report_generator\temp\report_parts\pdf\report_content.pdf",
-    'full_content':r"OnDemand\report_generator\temp\report_parts\pdf\report_full_content.pdf",
-    'final':r"OnDemand\report_generator\result\report.pdf"
-}
 
 async def merge_cover_with_content(cover_pdf:str,content_pdf:str,final_pdf_path: str)->str:
     
@@ -86,18 +79,18 @@ async def render_to_pdf(html_dict:Dict[str,Any])->Optional[str]:
 
     try:
         for part in html_dict.keys():
-            await first_render(html_dict.get(part),pdf_results.get(part))
+            await first_render(html_dict.get(part),PDF_RESULT_PATHS.get(part))
 
-        full_content_pdf=await merge_format_with_content(pdf_results.get('format'),
-                                                         pdf_results.get('content'),
-                                                         pdf_results.get('full_content'))
+        full_content_pdf=await merge_format_with_content(PDF_RESULT_PATHS.get('format'),
+                                                         PDF_RESULT_PATHS.get('content'),
+                                                         PDF_RESULT_PATHS.get('full_content'))
         
         if not full_content_pdf:
             return None
         
-        final_pdf=await merge_cover_with_content(pdf_results.get('cover'),
+        final_pdf=await merge_cover_with_content(PDF_RESULT_PATHS.get('cover'),
                                                  full_content_pdf,
-                                                 pdf_results.get('final'))
+                                                 PDF_RESULT_PATHS.get('final'))
 
         return final_pdf if final_pdf else None
 

@@ -3,24 +3,12 @@ from typing import Optional,Dict,Any
 from pathlib import Path
 from jinja2 import Environment, FileSystemLoader
 
+from OnDemand.report_generator.protocols.auxiliar_info import STATIC_FOLDER,HTML_TEMPLATES_PATH,HTML_REPORT_PARTS_TEMPLATES,HTML_REPORT_PARTS_RESULT
+
 import logging
 logger = logging.getLogger(__name__)
 
-templates_path = r"OnDemand\report_generator\static\templates"
-
-STATIC_ROOT = Path(r"OnDemand\report_generator\static").resolve()
-
-templates = {
-    "cover": "cover_template.html",
-    "format": "format_template.html",
-    "content": "content_template.html",
-}
-
-results = {
-    "cover": r"OnDemand\report_generator\temp\report_parts\html\cover_result.html",
-    "format": r"OnDemand\report_generator\temp\report_parts\html\format_result.html",
-    "content": r"OnDemand\report_generator\temp\report_parts\html\content_result.html",
-}
+STATIC_ROOT = Path(STATIC_FOLDER).resolve()
 
 async def file_uri(rel_path: str) -> str:
     return (STATIC_ROOT / rel_path).resolve().as_uri()
@@ -36,7 +24,7 @@ async def inject_graph_uris_inplace(report_data: Dict[str,Any]) -> Dict[str,Any]
 
 async def generate_html_report(report_data: Dict[str,Any])->Optional[Dict[str,Any]]:
     try:
-        env = Environment(loader=FileSystemLoader(templates_path))
+        env = Environment(loader=FileSystemLoader(HTML_TEMPLATES_PATH))
 
         await inject_graph_uris_inplace(report_data)
 
@@ -46,15 +34,15 @@ async def generate_html_report(report_data: Dict[str,Any])->Optional[Dict[str,An
             "loguito": await file_uri("img/loguito.png"),
         })
 
-        for part_key, template_name in templates.items():
+        for part_key, template_name in HTML_REPORT_PARTS_TEMPLATES.items():
             template = env.get_template(template_name)
             html_output = template.render(**report_data)
 
-            output_path = results[part_key]
+            output_path = HTML_REPORT_PARTS_RESULT[part_key]
             with open(output_path, "w", encoding="utf-8") as f:
                 f.write(html_output)
 
-        return results
+        return HTML_REPORT_PARTS_RESULT
 
     except Exception:
         logger.exception("Error rendering the report html")

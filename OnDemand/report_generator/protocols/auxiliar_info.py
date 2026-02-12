@@ -2,12 +2,41 @@ TEMP_GEN_GRAPHS_PATH=r"C:\Users\jeras\Documents\PowerView\backend_pv\OnDemand\re
 
 GRAPH_PATH=r'\temp\gen_graphs'
 
-TEMPLATE_DIR = "OnDemand/uS/generate_report/static/templates/"
+############### HTML RENDER ###################
+STATIC_FOLDER=r"OnDemand\report_generator\static"
 
-OUTPUT_HTML = "OnDemand/uS/generate_report/result/editable_report.html"
+HTML_TEMPLATES_PATH=r"OnDemand\report_generator\static\templates"
 
+HTML_REPORT_PARTS_TEMPLATES={
+    "cover": "cover_template.html",
+    "format": "format_template.html",
+    "content": "content_template.html",
+}
 
+HTML_REPORT_PARTS_RESULT = {
+    "cover": r"OnDemand\report_generator\temp\report_parts\html\cover_result.html",
+    "format": r"OnDemand\report_generator\temp\report_parts\html\format_result.html",
+    "content": r"OnDemand\report_generator\temp\report_parts\html\content_result.html",
+}
+###############################################
 
+############### PDF RENDER ####################
+PDF_RESULT_PATHS={
+    'cover':r"OnDemand\report_generator\temp\report_parts\pdf\report_cover.pdf",
+    'format':r"OnDemand\report_generator\temp\report_parts\pdf\report_format.pdf",    
+    'content':r"OnDemand\report_generator\temp\report_parts\pdf\report_content.pdf",
+    'full_content':r"OnDemand\report_generator\temp\report_parts\pdf\report_full_content.pdf",
+    'final':r"OnDemand\report_generator\result\report.pdf"
+}
+###############################################
+
+############### CSV RENDER ####################
+CSV_FINAL_PATH=r"OnDemand\report_generator\result\report.xlsx"
+###############################################
+
+############### COMPRESS TO ZIP ###############
+ZIP_REPORT_PATH=r"OnDemand\report_generator\result\report.zip"
+###############################################
 
 
 PREMADE_ORDERS={

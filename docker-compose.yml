@@ -120,6 +120,22 @@ services:
 
       restart: unless-stopped
 
+  report_generator:
+      build:
+      context: .
+      dockerfile: ./OnDemand/report_generator/DockerFile
+      container_name: report_generator
+      env_file:
+        - ./OnDemand/report_generator/.env.docker
+      environment:
+        TZ: America/Guayaquil
+      depends_on:
+        postgres:
+          condition: service_healthy
+        gateway:
+          condition: service_healthy
+
+      restart: unless-stopped
 
 volumes:
   mosquitto_data:

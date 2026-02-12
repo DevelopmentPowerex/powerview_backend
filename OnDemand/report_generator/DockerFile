@@ -1,0 +1,23 @@
+FROM python:3.12-slim
+
+WORKDIR /app
+
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+
+ENV PYTHONPATH=/app/OnDemand
+
+# Dependencias del sistema (útiles para wheels/compilación si alguna lib lo requiere)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential gcc git \
+ && rm -rf /var/lib/apt/lists/*
+
+# Instalar dependencias del servicio 
+COPY OnDemand/report_generator/requirements_report_docker.txt /app/requirements_report_docker.txt
+
+RUN pip install --no-cache-dir -r /app/requirements_report_docker.txt
+
+COPY . /app
+
+# Ejecuta el gateway. Ajusta si tu app no se llama "app".
+#CMD ["python", "-m","report_generator.report_gen_main"]

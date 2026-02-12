@@ -1,5 +1,7 @@
+from pathlib import Path
 import pandas as pd
 
+from OnDemand.report_generator.protocols.auxiliar_info import CSV_FINAL_PATH
 
 import logging
 logger = logging.getLogger(__name__)
@@ -9,7 +11,7 @@ async def generate_csv(circuits,whole_reading):
 
     circuits_list=[c.get('nickname') for c in circuits]
 
-    out_path=r"C:\Users\jeras\Documents\PowerView\backend_pv\OnDemand\report_generator\result\report.xlsx"
+    out_path=Path(CSV_FINAL_PATH).resolve()
 
     with pd.ExcelWriter(out_path, engine="openpyxl", datetime_format="yyyy-mm-dd hh:mm:ss") as writer:
         for circuit in circuits_list:

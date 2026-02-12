@@ -144,8 +144,8 @@ async def report_gen(client_name:str,project_name:str,start_date:str, end_date:s
     logger.debug(f'Excel archive generated and saved on: {excel_archive}')
 
     final_zip= await compress_to_zip(pdf_report,
-                                     excel_archive,
-                                    r"OnDemand\report_generator\result\report.zip")
+                                     excel_archive)
+    
     if not final_zip:
         logger.error("Error compressing the report archives")
         return None
@@ -153,10 +153,9 @@ async def report_gen(client_name:str,project_name:str,start_date:str, end_date:s
 
     return final_zip
     
-    
 
 async def main():
-    test_report=await report_gen('Cooperativa Jardín Azuayo','Proyecto A',"2026-01-19T17:48:00","2026-01-20T12:00:00")
+    test_report=await report_gen('Cliente de prueba','Proyecto A',"2026-01-19T00:00:00","2026-01-20T23:59:59")
 
 if __name__ == "__main__":  
 
