@@ -6,8 +6,6 @@ from OnDemand.report_generator.report_gen_main import report_gen
 
 from fastapi import APIRouter, Query
 
-from datetime import datetime
-
 import logging
 logger = logging.getLogger(__name__)
 

@@ -5,7 +5,7 @@ GRAPH_PATH=r'\temp\gen_graphs'
 ############### HTML RENDER ###################
 STATIC_FOLDER=r"OnDemand\report_generator\static"
 
-HTML_TEMPLATES_PATH=r"OnDemand\report_generator\static\templates"
+HTML_TEMPLATES_PATH="OnDemand/report_generator/static/templates"
 
 HTML_REPORT_PARTS_TEMPLATES={
     "cover": "cover_template.html",
@@ -14,28 +14,28 @@ HTML_REPORT_PARTS_TEMPLATES={
 }
 
 HTML_REPORT_PARTS_RESULT = {
-    "cover": r"OnDemand\report_generator\temp\report_parts\html\cover_result.html",
-    "format": r"OnDemand\report_generator\temp\report_parts\html\format_result.html",
-    "content": r"OnDemand\report_generator\temp\report_parts\html\content_result.html",
+    "cover": "OnDemand/report_generator/temp/report_parts/html/cover_result.html",
+    "format": "OnDemand/report_generator/temp/report_parts/html/format_result.html",
+    "content": "OnDemand/report_generator/temp/report_parts/html/content_result.html",
 }
 ###############################################
 
 ############### PDF RENDER ####################
 PDF_RESULT_PATHS={
-    'cover':r"OnDemand\report_generator\temp\report_parts\pdf\report_cover.pdf",
-    'format':r"OnDemand\report_generator\temp\report_parts\pdf\report_format.pdf",    
-    'content':r"OnDemand\report_generator\temp\report_parts\pdf\report_content.pdf",
-    'full_content':r"OnDemand\report_generator\temp\report_parts\pdf\report_full_content.pdf",
-    'final':r"OnDemand\report_generator\result\report.pdf"
+    'cover':"OnDemand/report_generator/temp/report_parts/pdf/report_cover.pdf",
+    'format':"OnDemand/report_generator/temp/report_parts/pdf/report_format.pdf",    
+    'content':"OnDemand/report_generator/temp/report_parts/pdf/report_content.pdf",
+    'full_content':"OnDemand/report_generator/temp/report_parts/pdf/report_full_content.pdf",
+    'final':"OnDemand/report_generator/result/report.pdf"
 }
 ###############################################
 
 ############### CSV RENDER ####################
-CSV_FINAL_PATH=r"OnDemand\report_generator\result\report.xlsx"
+CSV_FINAL_PATH="OnDemand/report_generator/result/report.xlsx"
 ###############################################
 
 ############### COMPRESS TO ZIP ###############
-ZIP_REPORT_PATH=r"OnDemand\report_generator\result\report.zip"
+ZIP_REPORT_PATH="OnDemand/report_generator/result/report.zip"
 ###############################################
 
 

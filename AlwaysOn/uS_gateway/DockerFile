@@ -5,22 +5,35 @@ WORKDIR /app
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
-# Importante para que "from DB.database import ..." funcione
+# Importante para imports compartidos
 ENV PYTHONPATH=/app/AlwaysOn
 
-# Dependencias del sistema (útiles para wheels/compilación si alguna lib lo requiere)
+# Para que los browsers queden "embebidos" en la imagen (recomendado en Docker)
+ENV PLAYWRIGHT_BROWSERS_PATH=0
+# Para que pip NO intente bajar browsers durante instalación
+ENV PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
+
+# Dependencias del sistema + libs típicas que Chromium necesita en slim
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential gcc git \
+    ca-certificates curl \
+    libnss3 libnspr4 libatk1.0-0 libatk-bridge2.0-0 libcups2 libdrm2 \
+    libxkbcommon0 libxcomposite1 libxdamage1 libxfixes3 libxrandr2 \
+    libgbm1 libasound2 libpangocairo-1.0-0 libpango-1.0-0 libgtk-3-0 \
+    libx11-6 libx11-xcb1 libxcb1 libxext6 libxi6 libglib2.0-0 \
  && rm -rf /var/lib/apt/lists/*
 
-# Instalar dependencias del gateway (tu archivo está en uS_gateway)
+# Instalar deps Python del gateway
 COPY AlwaysOn/uS_gateway/requirements_gtw.txt /app/requirements_gtw.txt
 RUN pip install --no-cache-dir -r /app/requirements_gtw.txt
 
-# Copiamos el repo completo para incluir AlwaysOn/DB y el resto del código compartido
+# Instalar SOLO Chromium (esto es lo que te faltaba)
+RUN python -m playwright install chromium
+
+# Copiar el repo completo
 COPY . /app
 
 EXPOSE 8000
 
-# Ejecuta el gateway. Ajusta si tu app no se llama "app".
 CMD ["python", "-m", "uvicorn", "uS_gateway.main:app", "--host", "0.0.0.0", "--port", "8000"]
+

@@ -24,13 +24,18 @@ services:
       TZ: America/Guayaquil
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
     restart: unless-stopped 
 
   postgres:
     image: postgres:17
     container_name: postgres
     ports:
-      - "127.0.0.1:5432"
+      - "5432:5432"
     environment:
       POSTGRES_DB: powerview
       POSTGRES_USER: jera
@@ -52,8 +57,8 @@ services:
     container_name: gateway
     env_file:
       - AlwaysOn/uS_gateway/.env.docker
-    expose:
-      - "8000"
+    ports:
+      - "8000:8000"
     depends_on:
       postgres:
         condition: service_healthy
@@ -74,7 +79,7 @@ services:
       mosquitto:
         condition: service_started
       rabbitmq:
-        condition: service_started
+        condition: service_healthy
       postgres:
         condition: service_healthy
       gateway:
@@ -93,7 +98,7 @@ services:
         TZ: America/Guayaquil
       depends_on:
         rabbitmq:
-          condition: service_started
+          condition: service_healthy
         postgres:
           condition: service_healthy
         gateway:
@@ -112,7 +117,7 @@ services:
         TZ: America/Guayaquil
       depends_on:
         rabbitmq:
-          condition: service_started
+          condition: service_healthy
         postgres:
           condition: service_healthy
         gateway:
@@ -122,20 +127,20 @@ services:
 
   report_generator:
       build:
-      context: .
-      dockerfile: ./OnDemand/report_generator/DockerFile
+        context: .
+        dockerfile: ./OnDemand/report_generator/DockerFile
       container_name: report_generator
       env_file:
-        - ./OnDemand/report_generator/.env.docker
+        - OnDemand/report_generator/.env.docker
       environment:
         TZ: America/Guayaquil
       depends_on:
         postgres:
           condition: service_healthy
         gateway:
-          condition: service_healthy
+          condition: service_started
 
-      restart: unless-stopped
+      restart: "no"
 
 volumes:
   mosquitto_data:
@@ -145,4 +150,5 @@ volumes:
   mqtt_collector_data:
   evaluator_data:
   notifier_data:
+  report_data:
 

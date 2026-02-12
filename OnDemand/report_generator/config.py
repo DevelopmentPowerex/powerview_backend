@@ -12,7 +12,7 @@ class Settings:
     env: str = os.getenv("ENV", "local")
     log_level: str = os.getenv("LOG_LEVEL", "INFO").upper()
 
-    gateway_url: str = os.getenv("GATEWAY_REPORTER_URL", "http://127.0.0.1:8000/permanent/report")
+    gateway_url: str = os.getenv("GATEWAY_REPORTER_URL", "http://127.0.0.1:8000/report")
     gateway_timeout:int=env_int("GATEWAY_TIMEOUT",30)
     
 
