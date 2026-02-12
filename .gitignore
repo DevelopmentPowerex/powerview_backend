@@ -76,3 +76,5 @@ docker/**/tmp/
 ################################
 AlwaysOn/**/__pycache__/
 AlwaysOn/**/.pytest_cache/
+OnDemand/**/__pycache__/
+OnDemand/**/.pytest_cache/
