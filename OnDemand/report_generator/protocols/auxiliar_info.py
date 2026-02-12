@@ -1,9 +1,7 @@
 TEMP_GEN_GRAPHS_PATH=r"C:\Users\jeras\Documents\PowerView\backend_pv\OnDemand\report_generator\temp\gen_graphs"
 
-GRAPH_PATH=r'\temp\gen_graphs'
-
 ############### HTML RENDER ###################
-STATIC_FOLDER=r"OnDemand\report_generator\static"
+STATIC_FOLDER="OnDemand/report_generator/static"
 
 HTML_TEMPLATES_PATH="OnDemand/report_generator/static/templates"
 
