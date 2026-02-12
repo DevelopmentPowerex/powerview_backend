@@ -26,7 +26,8 @@ ENV/
 
 AlwaysOn/**/venv_*/
 AlwaysOn/**/env_*/
-
+OnDemand/**/env_*/
+OnDemand/**/venv_*/
 ################################
 # ENV FILES (NUNCA al contenedor)
 ################################

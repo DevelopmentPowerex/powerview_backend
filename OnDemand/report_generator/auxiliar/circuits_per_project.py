@@ -8,9 +8,9 @@ from ..protocols.endpoints import FETCH_CIRCUITS_ENDPOINT
 
 import logging
 logger = logging.getLogger(__name__)
-async def get_project_circuits(client_name:str,
-                               searched_project:str,
-                               client:httpx.AsyncClient)->Optional[List[Dict[str,Any]]]: 
+
+async def get_project_circuits(client_name:str,searched_project:str,client:httpx.AsyncClient)->Optional[List[Dict[str,Any]]]: 
+    
     response = await client.get(
         f"{settings.gateway_url}{FETCH_CIRCUITS_ENDPOINT}",
         params={"client_name": client_name,
@@ -24,8 +24,6 @@ async def get_project_circuits(client_name:str,
         logger.debug(f'No circuits for: {searched_project}')    
         return None
     
-    logger.debug(response_data)
-
     return response_data
 
   

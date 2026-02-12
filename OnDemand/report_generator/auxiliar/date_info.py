@@ -1,7 +1,5 @@
-import asyncio
 from datetime import datetime, date
 from typing import Optional,Any,Dict
-
 
 import logging
 logger = logging.getLogger(__name__)
@@ -71,16 +69,3 @@ async def dates_info(start_report:str,end_report:str)->Optional[Dict[str,Any]]:
     except Exception:
         logger.exception("Error processing the report dates")
         return None
-
-if __name__ == "__main__":  
-    
-    start_date = '2025-09-15T23:50:12'
-    end_date = '2025-09-16T09:48:33'
-
-    formated = asyncio.run(report_info(start_date,end_date))
-
-    if formated:
-        logger.info(formated) 
-        
-    else:
-        logger.error('mal mal mal') 

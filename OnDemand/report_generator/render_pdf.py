@@ -2,7 +2,7 @@ from pathlib import Path
 from pypdf import PdfReader, PdfWriter
 from playwright.async_api import async_playwright
 import copy
-from typing import Dict,Any
+from typing import Optional,Dict,Any
 
 
 import logging
@@ -16,7 +16,7 @@ pdf_results={
     'final':r"OnDemand\report_generator\result\report.pdf"
 }
 
-async def merge_cover_with_content(cover_pdf:str,content_pdf:str,final_pdf_path: str):
+async def merge_cover_with_content(cover_pdf:str,content_pdf:str,final_pdf_path: str)->str:
     
     cover_reader = PdfReader(cover_pdf)
     body_reader = PdfReader(content_pdf)
@@ -34,7 +34,7 @@ async def merge_cover_with_content(cover_pdf:str,content_pdf:str,final_pdf_path:
     return final_pdf_path
 
 
-async def merge_format_with_content(format_pdf_path: str,content_pdf_path: str,output_pdf_path: str):
+async def merge_format_with_content(format_pdf_path: str,content_pdf_path: str,output_pdf_path: str)->str:
     
     format_reader = PdfReader(format_pdf_path)
     content_reader = PdfReader(content_pdf_path)
@@ -82,14 +82,12 @@ async def first_render(html_path: str, pdf_path: str):
 
         await browser.close()
 
-async def render_to_pdf(html_dict:Dict[str,Any]):
+async def render_to_pdf(html_dict:Dict[str,Any])->Optional[str]:
 
     try:
-        #1. Generar las 3 partes del reporte
         for part in html_dict.keys():
             await first_render(html_dict.get(part),pdf_results.get(part))
 
-        #2. Unir Header/Footer al contenido general
         full_content_pdf=await merge_format_with_content(pdf_results.get('format'),
                                                          pdf_results.get('content'),
                                                          pdf_results.get('full_content'))

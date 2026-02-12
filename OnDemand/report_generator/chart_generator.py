@@ -1,13 +1,14 @@
-import asyncio 
-from typing import Optional,Any,Dict,List
+from typing import Any,Dict,List,Optional
 
-from .protocols.auxiliar_info import PARAMETER_TRANSLATION, PARAMETERS_FOR_EVENTS, PARAMETERS_FOR_REPORT, PARAMETERS_CHART_ORDER, PREMADE_ORDERS
 from OnDemand.report_generator.auxiliar.normal_graphs import chart_order as create_charts
+
+
+from .protocols.auxiliar_info import PREMADE_ORDERS
 
 import logging
 logger = logging.getLogger(__name__)
 
-async def clean_chart_data(circuits:List[int],measurements:List[Dict[str,Any]],start_date:str,end_date:str):
+async def clean_chart_data(circuits:List[int],measurements:List[Dict[str,Any]])->Optional[List[Dict[str,Any]]]:
     try:
         graphs_list=[]
         
@@ -37,13 +38,14 @@ async def clean_chart_data(circuits:List[int],measurements:List[Dict[str,Any]],s
             graphs_list.append(circuit_graphs)
 
         return graphs_list
+    
     except Exception:
         logger.exception("Error preparing the data for chart generation")
         return None
 
-async def generate_report_charts(circuits:List[int],measurements:List[Dict[str,Any]],start_date:str,end_date:str): 
+async def generate_report_charts(circuits:List[int],measurements:List[Dict[str,Any]])->Optional[Dict[str,Any]]: 
 
-    clean_data=await clean_chart_data(circuits,measurements,start_date,end_date)
+    clean_data=await clean_chart_data(circuits,measurements)
     if not clean_data:
         logger.error("Error preparing the measurements for chart generation")
         return None
@@ -52,7 +54,7 @@ async def generate_report_charts(circuits:List[int],measurements:List[Dict[str,A
     if not charts_per_meter:
         logger.error("Error generating the required charts")
         return None
-
+    
     return charts_per_meter
 
 

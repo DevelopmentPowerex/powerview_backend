@@ -20,7 +20,14 @@ setup_logging(settings.log_level)
 import logging
 logger = logging.getLogger(__name__)
 
-async def build_order(client_name:str,project_name:str,dates_part:Dict[str,Any],circuits_per_project, readings_for_report, events_for_report,charts_for_report): #Formar la orden JSON para el renderizador de la plantilla HTML
+async def build_order(client_name:str,
+                      project_name:str,
+                      dates_part:Dict[str,Any],
+                      circuits_per_project:List[Dict[str,Any]], 
+                      readings_for_report:List[Dict[str,Any]], 
+                      events_for_report:List[Dict[str,Any]],
+                      charts_for_report:Dict[str,Any]
+                      )->Dict[str,Any]:
     
     dates_part["csv"]=client_name.replace(" ","_").lower()+"_"+project_name.lower().replace(" ","_")+dates_part["csv"]
  
@@ -83,10 +90,7 @@ async def build_order(client_name:str,project_name:str,dates_part:Dict[str,Any],
      
     return report_data
 
-async def report_gen(client_name:str,
-                     project_name:str,
-                     start_date:str,
-                     end_date:str): 
+async def report_gen(client_name:str,project_name:str,start_date:str, end_date:str)->Optional[str]:
     
     dates_part = await get_report_dates(start_date,
                                         end_date)
@@ -105,8 +109,7 @@ async def report_gen(client_name:str,
     logger.debug(report_readings['report'])
 
     charts_for_report=await generate_report_charts(report_readings.get('circuits'),
-                                                   report_readings.get('readings'),
-                                                   start_date,end_date)
+                                                   report_readings.get('readings'))
     if not charts_for_report:
         return None
     logger.debug(charts_for_report)

@@ -1,7 +1,9 @@
+from typing import Optional,Dict,Any
+
 from pathlib import Path
 from jinja2 import Environment, FileSystemLoader
-import logging
 
+import logging
 logger = logging.getLogger(__name__)
 
 templates_path = r"OnDemand\report_generator\static\templates"
@@ -23,16 +25,16 @@ results = {
 async def file_uri(rel_path: str) -> str:
     return (STATIC_ROOT / rel_path).resolve().as_uri()
 
-async def inject_graph_uris_inplace(report_data: dict) -> dict:
+async def inject_graph_uris_inplace(report_data: Dict[str,Any]) -> Dict[str,Any]:
 
     for circuit in report_data.get("circuits_list", []):
         for graph in circuit.get("behaviour_images", []):
             img = graph.get("image")
-            if img:  # evita None o ""
-                graph["image_uri"] = Path(img).resolve().as_uri()
+            graph["image_uri"] = Path(img).resolve().as_uri()
+            
     return report_data
 
-async def generate_html_report(report_data: dict):
+async def generate_html_report(report_data: Dict[str,Any])->Optional[Dict[str,Any]]:
     try:
         env = Environment(loader=FileSystemLoader(templates_path))
 

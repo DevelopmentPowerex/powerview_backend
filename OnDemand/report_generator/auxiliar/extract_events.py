@@ -1,17 +1,13 @@
-import asyncio
-import json
-from datetime import datetime
 import httpx
-from typing import Optional,Any,Dict,List
+from typing import List, Optional,Dict,Any
 
 from ..config import settings
-from ..protocols.auxiliar_info import M3_MAPPING
 from ..protocols.endpoints import EXTRACT_EVENTS_ENDPOINT
 
 import logging
 logger = logging.getLogger(__name__)
 
-async def fetch_events(extract_ids:List,start_date:str,end_date:str,client:httpx.AsyncClient):
+async def fetch_events(extract_ids:List,start_date:str,end_date:str,client:httpx.AsyncClient)->Optional[List[Dict[str,Any]]]:
     try:
         response = await client.get(
                 f"{settings.gateway_url}{EXTRACT_EVENTS_ENDPOINT}",
@@ -23,10 +19,10 @@ async def fetch_events(extract_ids:List,start_date:str,end_date:str,client:httpx
 
         response.raise_for_status()
         response_data=response.json()
+
         if not response_data:
             logger.error(f'No events returned for meters: {extract_ids}')    
             return None
-
         return response_data
     
     except Exception:

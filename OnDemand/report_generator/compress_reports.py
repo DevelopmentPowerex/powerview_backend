@@ -1,14 +1,11 @@
-from typing import Dict,Any
+from typing import Optional
 from pathlib import Path
 import zipfile
-import tempfile
 
 import logging
 logger = logging.getLogger(__name__)
 
-async def compress_to_zip(pdf_report:str,
-                           excel_report:str,
-                           final_zip:str):
+async def compress_to_zip(pdf_report:str,excel_report:str,final_zip:str)->Optional[str]:
     
     pdf_path=Path(pdf_report)
     xlsx_path=Path(excel_report)

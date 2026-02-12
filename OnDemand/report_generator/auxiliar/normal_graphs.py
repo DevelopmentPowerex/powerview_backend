@@ -1,17 +1,16 @@
-import asyncio
-from datetime import datetime
-from typing import Optional, Any, Dict, List
-import matplotlib.pyplot as plt
-import matplotlib.dates as mdates
-from matplotlib.ticker import MaxNLocator, FixedLocator
-from datetime import datetime, timedelta
-import numpy as np
 import pandas as pd
 
-# Configurar un estilo más profesional
+from datetime import datetime
+
+from typing import Optional, Any, Dict, List
+
+from matplotlib.ticker import MaxNLocator, FixedLocator
+import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
+
 plt.style.use('seaborn-v0_8-whitegrid')
 
-from ..protocols.auxiliar_info import PARAMETERS_FOR_REPORT, PREMADE_ORDERS, DATOS_PRUEBA, TEMP_GEN_GRAPHS_PATH, GRAPH_PATH
+from ..protocols.auxiliar_info import PARAMETERS_FOR_REPORT, PREMADE_ORDERS, TEMP_GEN_GRAPHS_PATH
 
 import logging
 logger = logging.getLogger(__name__)
@@ -49,7 +48,7 @@ async def chart_order(charts_data:List[Dict[str,Any]])->Optional[str]:
 
     return circuits_n_charts if circuits_n_charts else None 
     
-async def create_line_chart(measurement_list:List[Dict[str,Any]], parameters_order:List[str], filename:str,order_file:str,graph_title:str,smooth_window=5):
+async def create_line_chart(measurement_list:List[Dict[str,Any]], parameters_order:List[str], filename:str,order_file:str,graph_title:str)->Optional[str]:
     fig, ax = plt.subplots(figsize=(10, 4))
 
     line_colors = ["#0b4b79", '#ff7f0e', "#39a02c", '#d62728', '#9467bd', 
@@ -153,12 +152,3 @@ async def create_line_chart(measurement_list:List[Dict[str,Any]], parameters_ord
     except Exception:
         logger.exception("Error generating report charts")
         return None
-
-async def main():
-    await chart_order(['V_all_1'],DATOS_PRUEBA)
-
-if __name__ == "__main__":  
-    try:
-        asyncio.run(main())
-    except KeyboardInterrupt:
-        logger.exception("KeyboardInterrupt: Shutting down service")

@@ -1,18 +1,18 @@
-import asyncio
 from datetime import datetime
 
 import httpx
-from typing import Optional,Any,Dict,List
+from typing import Optional,Any,Dict,List,Tuple
 
 from statistics import mean
 
 from ..config import settings
-from ..protocols.auxiliar_info import PARAMETERS_FILTER, PREMADE_ORDERS,PARAMETERS_FOR_REPORT
+from ..protocols.auxiliar_info import PREMADE_ORDERS,PARAMETERS_FOR_REPORT
 from ..protocols.endpoints import EXTRACT_MEASURES_ENDPOINT
+
 import logging
 logger = logging.getLogger(__name__)
 
-async def extract_measures(meter_id:List,start_date:datetime,end_date:datetime,client:httpx.AsyncClient):
+async def extract_measures(meter_id:List,start_date:datetime,end_date:datetime,client:httpx.AsyncClient)->Optional[List[Dict[str,Any]]]:
     try:
         response = await client.get(
             f"{settings.gateway_url}{EXTRACT_MEASURES_ENDPOINT}",
@@ -28,13 +28,13 @@ async def extract_measures(meter_id:List,start_date:datetime,end_date:datetime,c
         if not response_data:
             logger.error(f'No measures returned for meter: {meter_id}')    
             return None
-
+        
         return response_data
     
     except Exception:
         logger.exception(f"Something went wrong while asking for the measure register")
 
-async def translate_values(extreme_values:Dict[str,Any]): 
+async def translate_values(extreme_values:Dict[str,Any])->Optional[List[Dict[str,Any]]]: 
     
     report_extremes=[]
     for circuit in extreme_values:
@@ -107,7 +107,7 @@ async def calculate_extreme(meter_list:List[int],measurement_list:List[Dict[str,
         
     return report_extremes
 
-async def fetch_readings(meter_list:List,start_date:datetime,end_date:datetime,client:httpx.AsyncClient):
+async def fetch_readings(meter_list:List,start_date:datetime,end_date:datetime,client:httpx.AsyncClient)->Tuple:
 
     try:
         extracted_measurements = await extract_measures(meter_list,start_date,end_date,client) 
