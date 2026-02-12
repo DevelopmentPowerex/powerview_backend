@@ -31,7 +31,8 @@ ENV/
 
 AlwaysOn/**/venv_*/
 AlwaysOn/**/env_*/
-
+OnDemand/**/env_*/
+OnDemand/**/venv_*/
 ################################
 # 🧠 IDE / EDITOR
 ################################
