@@ -36,7 +36,8 @@ async def fetch_report_data(client_name:str,project_name:str,start_date:str,end_
         logger.debug(event_list)
         if not event_list:
             logger.error('Error while obtaining the events/alarms register')
-        
+            event_list=[]
+            
         return {
             'circuits':circuits,
             'report':extreme_values,
