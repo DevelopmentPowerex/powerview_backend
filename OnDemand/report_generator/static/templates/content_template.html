@@ -195,7 +195,7 @@
         <!-- GRAFICAS COMPORTAMIENTO -->
         <h2 class="text-2xl font-bold text-slate-900 mt-4">2. Gráficas de comportamiento</h2>
         <p class="mt-4 text-slate-700 leading-relaxed text-sm">
-        En las siguientes gráficas se puede revisar el comportamiento que han tenido los parámetros eléctricos de los circuitos monitoreados de {{project_info.project_name}}
+        En las siguientes gráficas se puede revisar el comportamiento que han tenido los parámetros eléctricos de los circuitos monitoreados de <b>{{project_info.project_name}}</b>
         </p>  
         
         {% for circuit in circuits_list %}
@@ -204,9 +204,7 @@
                 <h3 class="text-xl font-bold text-slate-900 mt-4">{{circuit.name}}</h3>
                 <div class="mt-4 grid grid-cols-1 gap-4">
                     {% for graph in circuit.behaviour_images %}
-                        <div class="grid-item p-2 rounded-sm ring-1 ring-slate-200 text-xs">
-                            <p class="text-xs uppercase tracking-wider text-slate-500">{{graph.name}}</p>
-                            <p class="mt-1 text-xl font-bold leading-none">———</p>
+                        <div class="grid-item p-2 rounded-sm ring-1 ring-slate-200">
                             <img src="{{graph.image_uri}}" alt="{{graph.name}}" class="chart-img"/>
                         </div> 
                     {% endfor %}
@@ -217,11 +215,11 @@
         {% endfor %}
 
 
-        <!-- TABLA ALARMAS -->
+        <!--ALARMAS -->
         <h2 class="mt-4 text-2xl font-bold text-slate-900">3. Alarmas ocurridas</h2>
         <p class="mt-4 text-sm text-slate-600">
             En caso de haberse presentado alguna eventualidad, esta fue notificada oportunamente a 
-            través del sistema automatizado de monitoreo. El registro de los eventos ocurridos es el siguiente.
+            través del sistema automatizado de monitoreo.
         </p>
         {% if events %}
             <div class="mt-4 overflow-hidden rounded-sm ring-1 ring-slate-400">   
@@ -230,8 +228,8 @@
                         <tr>
                             <th class="font-semibold p-3">#</th>
                             <th class="font-semibold p-3">Circuito</th>
-                            <th class="font-semibold p-3">Contexto</th>
-                            <th class="font-semibold p-3">Regla rota</th>
+                            <th class="font-semibold p-3">Descripción</th>
+                            <th class="font-semibold p-3">Condición de alarma</th>
                             <th class="font-semibold p-3">Primer evento</th>
                             <th class="font-semibold p-3">Último evento</th>
                             <th class="font-semibold p-3">Cantidad de incidencias</th>
@@ -241,7 +239,6 @@
                 <tbody>
                     {%for event in events%}
                         <tr>
-        
                             <td class="p-1">{{loop.index}}</td>
                             <td class="p-1">{{event.circuit}}</td>
                             <td class="p-1">{{event.context}}</td>
@@ -262,6 +259,19 @@
                 </tbody>
                 </table>
             </div>
+            <p class="mt-4 text-slate-700 leading-relaxed text-sm">
+              Para mejor entendimiento de los eventos ocurridos, revise las siguientes gráficas:
+            </p> 
+            <div class="mt-4 grid grid-cols-2 gap-4">
+                {% for event in events %}
+                    <div class="grid-item p-2 rounded-sm ring-1 ring-slate-200 text-xs">
+                        <p class="text-xs uppercase tracking-wider text-slate-500">Evento {{loop.index}}: {{event.context}}</p>
+                        <p class="mt-1 text-xl font-bold leading-none">———</p>
+                        <img src="{{event.image_uri}}" alt="{{event.rule}}" class="chart-img"/>
+                    </div> 
+                {% endfor %}
+            </div>
+
         {%else%}
         <p class="mt-4 text-slate-500 italic">No se registraron alarmas en el periodo.</p>
         {%endif%}
@@ -280,7 +290,7 @@
         <div class="mt-16 flex items-center justify-center gap-3 text-sm text-slate-500">
             <div>
                 <p class="mt-4 text-slate-700 leading-relaxed">
-                    En caso de necesitar mayor explicación o detalle de lo incluido en este informe, por favor comuniquese con su provedor de servicio <b>{{project_info.fae.company_name}}</b>
+                    En caso de necesitar mayor explicación o detalle de lo incluido en este informe, por favor comuníquese con su provedor de servicio <b>{{project_info.fae.company_name}}</b>
                 </p>
                 <p class="mt-4 text-slate-700 leading-relaxed">
                     <b>Ingeniero Responsable: </b>

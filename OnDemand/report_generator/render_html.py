@@ -19,7 +19,11 @@ async def inject_graph_uris_inplace(report_data: Dict[str,Any]) -> Dict[str,Any]
         for graph in circuit.get("behaviour_images", []):
             img = graph.get("image")
             graph["image_uri"] = Path(img).resolve().as_uri()
-            
+    
+    for event in report_data.get("events"):
+        img = event.get("graph")
+        event["image_uri"] = Path(img).resolve().as_uri()
+
     return report_data
 
 async def generate_html_report(report_data: Dict[str,Any])->Optional[Dict[str,Any]]:

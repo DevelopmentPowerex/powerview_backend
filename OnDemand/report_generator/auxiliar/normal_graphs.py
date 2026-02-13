@@ -86,7 +86,7 @@ async def create_line_chart(measurement_list:List[Dict[str,Any]], parameters_ord
 
             # Graficar línea suavizada
             line_color = line_colors[i % len(line_colors)]
-            ax.plot(dates, values_series, color=line_color, linewidth=1.5, label=parameter, alpha=0.8)
+            ax.plot(dates, values_series, color=line_color, linewidth=1.5, label=PARAMETERS_FOR_REPORT[parameter][2], alpha=0.8)
 
             # Máximo y mínimo
             max_idx = values_filled.idxmax()
@@ -94,28 +94,12 @@ async def create_line_chart(measurement_list:List[Dict[str,Any]], parameters_ord
             max_val = values_filled[max_idx]
             min_val = values_filled[min_idx]
 
-            # Destacar max y mínimos del parametro graficado
-            ax.scatter([max_idx], [max_val], color=line_color, s=100, 
-                    marker='^', zorder=5, edgecolors='black', linewidth=1)
-            ax.scatter([min_idx], [min_val], color=line_color, s=100, 
-                    marker='v', zorder=5, edgecolors='black', linewidth=1)
-
-            # Etiquetas de valores máx y min
-            ax.annotate(f"Máx: {max_val:.2f}",
-                        xy=(max_idx, max_val),
-                        xytext=(0, 15), textcoords='offset points',
-                        ha='center', va='bottom',
-                        fontsize=9, fontweight='bold',
-                        bbox=dict(boxstyle="round,pad=0.3", fc="white", ec=line_color, alpha=0.8),
-                        arrowprops=dict(arrowstyle='->', lw=1.5, color=line_color))
-
-            ax.annotate(f"Mín: {min_val:.2f}",
-                        xy=(min_idx, min_val),
-                        xytext=(0, -25), textcoords='offset points',
-                        ha='center', va='top',
-                        fontsize=9, fontweight='bold',
-                        bbox=dict(boxstyle="round,pad=0.3", fc="white", ec=line_color, alpha=0.8),
-                        arrowprops=dict(arrowstyle='->', lw=1.5, color=line_color))
+            if max_val != min_val:
+                # Destacar max y mínimos del parametro graficado
+                ax.scatter([max_idx], [max_val], color=line_color, s=100, 
+                        marker='x', zorder=5, edgecolors='black', linewidth=1)
+                ax.scatter([min_idx], [min_val], color=line_color, s=100, 
+                        marker='v', zorder=5, edgecolors='black', linewidth=1)
 
         # Eje principal en X, marcas de hora
         ax.xaxis.set_major_locator(MaxNLocator(nbins=7))

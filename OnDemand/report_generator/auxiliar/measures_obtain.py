@@ -46,7 +46,7 @@ async def translate_values(extreme_values:Dict[str,Any])->Optional[List[Dict[str
             for parameter in PREMADE_ORDERS[report_parameter][0]:
                 if not(circuit['extreme_values'][parameter]['max'] == 0 and circuit['extreme_values'][parameter]['min'] ==0 and circuit['extreme_values'][parameter]['prom'] == 0):
                     new_param_values.append({
-                        'name':parameter,
+                        'name':PARAMETERS_FOR_REPORT[parameter][2],
                         'max':circuit['extreme_values'][parameter]['max'],
                         'min':circuit['extreme_values'][parameter]['min'],
                         'prom':circuit['extreme_values'][parameter]['prom']

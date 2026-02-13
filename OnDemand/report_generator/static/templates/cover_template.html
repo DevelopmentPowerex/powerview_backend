@@ -141,7 +141,7 @@
         <div class="p-4 rounded-sm border border-slate-200">
             <p class="text-xs uppercase tracking-wider text-slate-500">Circuitos</p>
             {% for circuit in circuits_list %}
-            <p class="font-medium">{{ circuit.name }}</p>
+            <p class="font-medium">{{loop.index}}.{{ circuit.name }}</p>
             {% endfor %}
         </div>
 

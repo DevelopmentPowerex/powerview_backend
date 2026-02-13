@@ -11,6 +11,8 @@ from OnDemand.report_generator.render_html import generate_html_report as genera
 from OnDemand.report_generator.render_pdf import render_to_pdf as html_to_pdf
 from OnDemand.report_generator.create_csv import generate_csv
 from OnDemand.report_generator.compress_reports import compress_to_zip
+from OnDemand.report_generator.generate_event_charts import generate_event_charts as create_event_charts
+
 
 from .config import settings
 
@@ -26,8 +28,8 @@ async def build_order(client_name:str,
                       circuits_per_project:List[Dict[str,Any]], 
                       readings_for_report:List[Dict[str,Any]], 
                       events_for_report:List[Dict[str,Any]],
-                      charts_for_report:Dict[str,Any]
-                      )->Dict[str,Any]:
+                      charts_for_report:Dict[str,Any],
+                      charts_for_events:List[str])->Dict[str,Any]:
     
     dates_part["csv"]=client_name.replace(" ","_").lower()+"_"+project_name.lower().replace(" ","_")+dates_part["csv"]
  
@@ -47,7 +49,7 @@ async def build_order(client_name:str,
                 break
         
     new_events_list=[]
-    for event in events_for_report:
+    for i,event in enumerate(events_for_report):
         match event.get('level'):
             case 1:
                 new_level="LOW"
@@ -65,7 +67,8 @@ async def build_order(client_name:str,
             "level":new_level,
             "first_event":event.get('1st_ts'),
             "last_event":event.get('last_ts'),
-            "event_counter":event.get('event_counter')
+            "event_counter":event.get('event_counter'),
+            "graph":charts_for_events[i]
         })
 
         
@@ -106,24 +109,34 @@ async def report_gen(client_name:str,project_name:str,start_date:str, end_date:s
     if not report_readings:
         logger.error("Error fetching the project readings")
         return None
-    logger.debug(report_readings['report'])
-
+    logger.debug(report_readings['events'])
+    
     charts_for_report=await generate_report_charts(report_readings.get('circuits'),
                                                    report_readings.get('readings'))
     if not charts_for_report:
+        logger.error("Error creating the report images")
         return None
     logger.debug(charts_for_report)
+
+    event_charts=await create_event_charts(report_readings.get('events'),
+                                           report_readings.get('readings'))
+    if not event_charts:
+        logger.error("Error creating the events images")
+        return None
+    logger.debug(event_charts)
 
     new_report_order= await build_order(client_name,project_name,dates_part, 
                                         report_readings.get('circuits'), 
                                         report_readings.get('report'),
                                         report_readings.get('events'), 
-                                        charts_for_report)
+                                        charts_for_report,
+                                        event_charts)
     if not new_report_order:
         logger.error('Error while generating the report order')
         return None
     logger.debug(new_report_order)
 
+    
     html_parts= await generate_html(new_report_order)
     if not html_parts:
         logger.error('Error while rendering the html templates')
@@ -150,7 +163,7 @@ async def report_gen(client_name:str,project_name:str,start_date:str, end_date:s
         logger.error("Error compressing the report archives")
         return None
     logger.debug(f'Zip archive generated and saved on: {final_zip}')
-
+    
     return final_zip
     
 
